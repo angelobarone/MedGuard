@@ -6,6 +6,7 @@ import img5 from './assets/background/pexels-pixabay-356040.jpg'
 import {useEffect, useState} from "react";
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import ClinicPage from './clinicPage.jsx';
+import AuthorizedPage from "./AuthorizedPage.jsx";
 
 const images = [img1,img2, img4, img5]
 
@@ -61,20 +62,27 @@ function Login(){
 
     const handleLogin = async () => {
         try {
-            const response = await fetch('https://example.com/api/login', {
+            const response = await fetch('http://127.0.0.1:5000/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: usernameInput, password: passwordInput }),
             });
+            const data = await response.json();
 
             if (!response.ok) throw new Error('Credenziali errate');
 
-            const data = await response.json();
             sessionStorage.setItem("username", data.username);
             sessionStorage.setItem("token", data.token);
             sessionStorage.setItem("publicKey", data.publicKey);
 
-            navigate('/dashboard');
+            console.log(data.type);
+            if(data.type === 'A'){
+                navigate('/clinicPage');
+            }
+            if(data.type === 'S'){
+                navigate('/authorizedPage');
+            }
+
         } catch (err) {
             alert(err.message);
         }
@@ -111,6 +119,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/clinicPage" element={<ClinicPage />} />
+            <Route path="/authorizedPage" element={<AuthorizedPage />} />
         </Routes>
     );
 }
