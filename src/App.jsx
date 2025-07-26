@@ -1,16 +1,20 @@
-import './stylesheet/App.css'
 import img1 from './assets/background/pexels-chokniti-khongchum-1197604-2280571.jpg'
 import img2 from './assets/background/pexels-fr3nks-305565.jpg'
 import img4 from './assets/background/pexels-pixabay-40568.jpg'
 import img5 from './assets/background/pexels-pixabay-356040.jpg'
+import img6 from './assets/background/3ff6cfbd-6d05-4657-bc8a-9554dc707c34.jpeg'
 import {useEffect, useState} from "react";
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
-import ClinicPage from './clinicPage.jsx';
-import AuthorizedPage from "./AuthorizedPage.jsx";
+import AuthorizedPage from "./pages/AuthorizedPage.jsx";
+import ClinicPage, { DataCollector } from "./pages/clinicPage.jsx";
+import DataSeeker from "./pages/AuthorizedPage.jsx";
+import Home from "./pages/Home.jsx";
+import Login from "./pages/Login.jsx";
+import {Route, Routes} from "react-router-dom";
+import JoinUs from "./pages/joinUs.jsx";
 
 const images = [img1,img2, img4, img5]
 
-function BackgroundCarousel() {
+export function BackgroundCarousel() {
     const randomNumber = Math.floor(Math.random() * 4);
     const [index, setIndex] = useState(randomNumber);
 
@@ -22,7 +26,7 @@ function BackgroundCarousel() {
         return () => clearInterval(interval); // pulizia intervallo
     }, []);
 
-    const backgroundStyle = {
+    /*const backgroundStyle = {
         position: "fixed",
         top: 0,
         left: 0,
@@ -33,95 +37,36 @@ function BackgroundCarousel() {
         backgroundPosition: "center",
         transition: "background-image 1s ease-in-out",
         zIndex: -1,
+    };*/
+    const backgroundStyle = {
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        backgroundImage: `url(${img6})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        transition: "background-image 1s ease-in-out",
+        zIndex: -1,
     };
     return <div style={backgroundStyle} />;
 }
 
-
-function Home(){
-    const navigate = useNavigate();
-    const vaiAlLogin = () => navigate('/login');
-
+export default function App() {
     return (
-        <>
+        <div className="App">
             <BackgroundCarousel />
-            <div className="container fade-in">
-                <img src = "/medguard.png" alt="logo" height="300px"/>
-                <h3>"per la statistica e la diagnosi medica su larga scala"</h3>
-                <button className="button" onClick={vaiAlLogin}>Accedi al database</button>
-            </div>
-        </>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/clinicPage" element={<ClinicPage />} />
+                <Route path="/authorizedPage" element={<AuthorizedPage />} />
+                <Route path="/dataCollector" element={<DataCollector />} />
+                <Route path="/dataSeeker" element={<DataSeeker />} />
+                <Route path="/joinUs" element={<JoinUs />} />
+            </Routes>
+        </div>
+
     );
 }
-
-function Login(){
-    const navigate = useNavigate();
-    const [usernameInput, setUsernameInput] = useState("");
-    const [passwordInput, setPasswordInput] = useState("");
-    const [error, setError] = useState("");
-
-    const handleLogin = async () => {
-        try {
-            const response = await fetch('http://127.0.0.1:5000/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: usernameInput, password: passwordInput }),
-            });
-            const data = await response.json();
-
-            if (!response.ok) throw new Error('Credenziali errate');
-
-            sessionStorage.setItem("username", data.username);
-            sessionStorage.setItem("token", data.token);
-            sessionStorage.setItem("publicKey", data.publicKey);
-
-            console.log(data.type);
-            if(data.type === 'A'){
-                navigate('/clinicPage');
-            }
-            if(data.type === 'S'){
-                navigate('/authorizedPage');
-            }
-
-        } catch (err) {
-            alert(err.message);
-        }
-    };
-
-    return (
-        <>
-            <BackgroundCarousel />
-            <div className="container fade-in">
-                <img src = "/medguard.png" alt="logo" height="300px"/>
-                <h2>Login</h2>
-                <input type="text"
-                       placeholder="Username"
-                       value = {usernameInput}
-                       onChange={(e) => setUsernameInput(e.target.value)}
-                />
-                <br />
-                <input type="password"
-                       placeholder="Password"
-                       value={passwordInput}
-                       onChange={(e) => setPasswordInput(e.target.value)}
-                />
-                <br />
-                <button className="button" onClick={handleLogin}>Accedi</button>
-                {error && <p style={{ color: "red" }}>{error}</p>}
-            </div>
-        </>
-    );
-}
-
-function App() {
-    return (
-        <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/clinicPage" element={<ClinicPage />} />
-            <Route path="/authorizedPage" element={<AuthorizedPage />} />
-        </Routes>
-    );
-}
-
-export default App;

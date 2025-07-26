@@ -1,5 +1,27 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  z-index: 0;
+}
+
+.header {
+  position: fixed;
+  width: 100%;
+  height: fit-content;
+  color: #00324D;
+  text-align: start;
+  padding : 10px;
+  z-index: 10;
+  font-family: Arial, sans-serif;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
 .container {
-  position: absolute;
+  position: fixed;
   top: 50%;
   left:50%;
   transform: translate(-50%, -50%);
@@ -7,14 +29,20 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: fit-content;
-  width: fit-content;
+  width: 80vw;         /* 80% della larghezza della viewport */
+  max-width: 700px;
+  min-width: 400px;
+
+  height: 60vh;        /* 60% dell'altezza della viewport */
+  max-height: 500px;
+  min-height: 300px;
   font-family: Arial, sans-serif;
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 50px;
   border-radius: 30px;
+  text-align: center;
 }
 
 .button {
@@ -28,6 +56,30 @@
   margin-top: 20px;
 }
 
+.button:hover {
+  background-color: #00324D;
+}
+
+.options{
+  background: none;       /* niente sfondo */
+  border: none;           /* niente bordo */
+  color: #00324D;            /* colore testo base */
+  cursor: pointer;        /* cursore a mano */
+  font-size: 16px;
+  padding: 0;             /* niente padding */
+  transition: color 0.3s ease, text-shadow 0.3s ease; /* transizione */
+  margin: 15px;
+}
+
+.options:hover {
+  color: #00324D;
+  text-shadow: 0 0 10px #00324D;
+}
+
+.options:focus {
+  outline: none;
+}
+
 .fade-in {
   animation: fadeIn 0.5s ease-in-out;
 }
@@ -36,6 +88,12 @@
   display: flex;
   text-align: center;
   color: #00324D;
+}
+
+.user{
+  font-family: Arial, sans-serif;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 @keyframes fadeIn {
