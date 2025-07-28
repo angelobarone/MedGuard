@@ -19,7 +19,7 @@ export default function ClinicPage() {
         navigate('/login');
     }
 
-    return (
+    return (aaaa
         <div>
             <header className="header">
                 <span style={{ marginLeft: '15px' }}>Logged in as: </span>
