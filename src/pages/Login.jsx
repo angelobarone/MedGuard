@@ -23,7 +23,6 @@ export default function Login(){
 
             sessionStorage.setItem("username", data.username);
             sessionStorage.setItem("token", data.token);
-            sessionStorage.setItem("publicKey", data.publicKey);
 
             console.log(data.type);
             if(data.type === 'A'){
