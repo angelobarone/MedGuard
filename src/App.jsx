@@ -5,12 +5,13 @@ import img5 from './assets/background/pexels-pixabay-356040.jpg'
 import img6 from './assets/background/3ff6cfbd-6d05-4657-bc8a-9554dc707c34.jpeg'
 import {useEffect, useState} from "react";
 import AuthorizedPage from "./pages/AuthorizedPage.jsx";
-import ClinicPage, { DataCollector } from "./pages/clinicPage.jsx";
-import DataSeeker from "./pages/AuthorizedPage.jsx";
+import DataSeeker from "./pages/DataSeeker.jsx";
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
 import {Route, Routes} from "react-router-dom";
-import JoinUs from "./pages/joinUs.jsx";
+import JoinUs from "./pages/Home.jsx";
+import ClinicPage from "./pages/clinicPage.jsx";
+import DataCollector from "./pages/DataCollector.jsx";
 
 const images = [img1,img2, img4, img5]
 
@@ -62,11 +63,10 @@ export default function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/clinicPage" element={<ClinicPage />} />
                 <Route path="/authorizedPage" element={<AuthorizedPage />} />
-                <Route path="/dataCollector" element={<DataCollector />} />
                 <Route path="/dataSeeker" element={<DataSeeker />} />
                 <Route path="/joinUs" element={<JoinUs />} />
+                <Route path="/dataCollector" element={<DataCollector />} />
             </Routes>
         </div>
-
     );
 }

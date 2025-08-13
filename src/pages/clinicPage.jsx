@@ -1,5 +1,6 @@
 import '../stylesheet/App.css'
 import {useNavigate} from "react-router-dom";
+import * as paillier from "paillier-bigint";
 
 export default function ClinicPage() {
     const clinic = sessionStorage.getItem('username');
@@ -19,6 +20,9 @@ export default function ClinicPage() {
         navigate('/login');
     }
 
+    PublicKeyFetcher()
+        .then(result => sessionStorage.setItem('publicKey', JSON.stringify(result)));
+
     return (
         <div>
             <header className="header">
@@ -27,7 +31,7 @@ export default function ClinicPage() {
                 <button className="options">Assistenza clienti 🚧</button>
                 <button className="options" onClick={logout}>Logout</button>
             </header>
-            <div className="container fade-in">
+            <div className = "container fade-in">
                 <img src="/medguard.png" alt="logo" height="300px" />
                 <button className="button" onClick={inserisciDati}>Inserisci nuovi dati</button>
                 <button className="button">Consulta i Dati pubblicati 🚧</button>
@@ -37,6 +41,68 @@ export default function ClinicPage() {
     );
 }
 
-export function DataCollector(){
+async function PublicKeyFetcher() {
+    try {
+        const username = sessionStorage.getItem('username');
+        if (!username) {
+            throw new Error('Username non trovato nella session storage');
+        }
 
+        // Aggiungi timeout e controllo CORS
+        const controller = new AbortController();
+        const timeout = 8000;
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+        const response = await fetch('http://127.0.0.1:5001/getPublicKey', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ username: username }),
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Errore dal server:', errorText);
+            throw new Error(`Errore HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Validazione della risposta
+        if (!data || typeof data !== 'object') {
+            throw new Error('Formato dati non valido');
+        }
+
+        return reconstructionPublicKey(data);
+
+    } catch (error) {
+        console.error('Errore in PublicKeyFetcher:', error);
+
+        // Gestione specifica per timeout o errori di connessione
+        if (error.name === 'AbortError') {
+            throw new Error('Timeout: il server non ha risposto entro 5 secondi');
+        } else if (error.message.includes('Failed to fetch')) {
+            throw new Error('Impossibile connettersi al server. Verifica che sia in esecuzione.');
+        }
+
+        throw error; // Rilancia per gestione esterna
+    }
+}
+
+function reconstructionPublicKey(data){
+    try {
+        // Converti le stringhe in BigInt
+        const n = BigInt(data.n);
+        const g = BigInt(data.g);
+
+        // Crea l'oggetto PublicKey
+        return new paillier.PublicKey(n, g);
+    } catch (error) {
+        console.error('Errore nella ricostruzione:', error);
+        throw new Error('Invalid public key format');
+    }
 }
