@@ -163,8 +163,7 @@ export default function DataCollector() {
                     clinic: clinic,
                     data: encData,
                     n: pkData.n,
-                    g: pkData.g
-                }),
+                })
             });
             const result = await response.json();
             if(result.success){

@@ -22,7 +22,15 @@ export default function AuthorizedPage() {
     }
 
     PrivateKeyFetcher()
-        .then(result => sessionStorage.setItem('privateKey', JSON.stringify(result)))
+        .then(result => {
+            const pkData = {
+                n: result.n.toString(),
+                g: result.g.toString(),
+                p: result.p.toString(),
+                q: result.q.toString()
+            };
+            sessionStorage.setItem('privateKey', JSON.stringify(pkData));
+            })
         .catch(error => console.error("Errore finale:", error));
 
     return (
@@ -77,7 +85,7 @@ async function PrivateKeyFetcher() {
             throw new Error('Formato dati non valido');
         }
 
-        return reconstructionPrivateKey(data);
+        return data;
 
     } catch (error) {
         console.error('Errore in PrivateKeyFetcher:', error);
@@ -93,63 +101,5 @@ async function PrivateKeyFetcher() {
     }
 }
 
-function reconstructionPrivateKey(data){
-    const publicKey = new paillier.PublicKey(BigInt(data.n), BigInt(data.g));
 
-    const p = BigInt(data.p);
-    const q = BigInt(data.q);
-    // const n = p * q;
-    const lambda = (p - 1n) * (q - 1n);
-    const mu = calculateMu(publicKey, lambda, p, q);
-
-    return new paillier.PrivateKey(lambda, mu, publicKey, p, q);
-}
-
-function calculateMu(publicKey, lambda, p, q) {
-    const n = p * q;
-    const nSquared = n * n;
-    const g = publicKey.g || n + 1n;
-
-    // Calcola g^lambda mod n² in modo efficiente
-    const gLambda = modPow(g, lambda, nSquared);
-
-    // Calcola L = (gLambda - 1n) / n
-    const L = (gLambda - 1n) / n;
-
-    // Calcola l'inverso moltiplicativo
-    return modInverse(L, n);
-}
-
-// Esponenziazione modulare efficiente (evita BigInt troppo grandi)
-function modPow(base, exponent, modulus) {
-    if (modulus === 1n) return 0n;
-    let result = 1n;
-    base = base % modulus;
-
-    while (exponent > 0n) {
-        if (exponent % 2n === 1n) {
-            result = (result * base) % modulus;
-        }
-        exponent = exponent >> 1n;
-        base = (base * base) % modulus;
-    }
-    return result;
-}
-
-// Calcolo inverso moltiplicativo (senza creare BigInt eccessivi)
-function modInverse(a, n) {
-    let t = 0n, newT = 1n;
-    let r = n, newR = a;
-
-    while (newR !== 0n) {
-        const quotient = r / newR;
-        [t, newT] = [newT, t - quotient * newT];
-        [r, newR] = [newR, r - quotient * newR];
-    }
-
-    if (r > 1n) throw new Error('Numero non invertibile');
-    if (t < 0n) t += n;
-
-    return t;
-}
 
