@@ -45,7 +45,9 @@ async function encryptForm(formData, pkData) {
     for (const [fieldName, key] of [
         ['pressione_sum', 'pressioneSangue'],
         ['colesterolo_sum', 'colesterolo'],
-        ['glucosio_sum', 'glucosio']
+        ['glucosio_sum', 'glucosio'],
+        ['peso_sum', 'peso'],
+        ['altezza_sum', 'altezza']
     ]) {
         const m = formData[key] ? fixedPoint(formData[key]) : 0n;
         encPayload[fieldName] = bigintHex(publicKey.encrypt(m));
@@ -53,6 +55,12 @@ async function encryptForm(formData, pkData) {
 
     encPayload.provincia = formData.provincia;
     encPayload.malattia = formData.malattia;
+
+    const oggi = new Date();
+    const nomiMesi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+        "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+    encPayload.mese = nomiMesi[oggi.getMonth()];
+    encPayload.anno = oggi.getFullYear();
 
     return encPayload;
 }
@@ -73,6 +81,8 @@ export default function DataCollector() {
     const [formData, setFormData] = useState({
         malattia: '',
         eta: '',
+        peso: '',
+        altezza:'',
         genere: '',
         fumatore: '',
         provincia: '',
@@ -82,7 +92,9 @@ export default function DataCollector() {
         stanchezza: '',
         pressioneSangue: '',
         colesterolo: '',
-        glucosio: ''
+        glucosio: '',
+        mese:'',
+        anno:''
     });
 
     const [errors, setErrors] = useState({});
@@ -109,6 +121,8 @@ export default function DataCollector() {
         // Validazione testo/numeri
         if (!formData.malattia.trim()) newErrors.malattia = 'Campo obbligatorio';
         if (!formData.eta) newErrors.eta = 'Campo obbligatorio';
+        if (!formData.peso) newErrors.peso = 'Campo obbligatorio';
+        if (!formData.altezza) newErrors.altezza = 'Campo obbligatorio';
         if (!formData.pressioneSangue.trim()) newErrors.pressioneSangue = 'Campo obbligatorio';
         if (!formData.colesterolo) newErrors.colesterolo = 'Campo obbligatorio';
         if (!formData.glucosio) newErrors.glucosio = 'Campo obbligatorio';
@@ -179,20 +193,19 @@ export default function DataCollector() {
             <div className="container fade-in">
                 <h1>Dati del paziente</h1>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="form-group">
-                            <label htmlFor="malattia">Malattia</label>
-                            <input
-                                type="text"
-                                id="malattia"
-                                name="malattia"
-                                value={formData.malattia}
-                                onChange={handleInputChange}
-                                placeholder="Es. Diabete, Ipertensione..."
-                                className="form-input"
-                            />
-                        </div>
-
+                    <div className="form-group">
+                        <label htmlFor="malattia">Malattia</label>
+                        <input
+                            type="text"
+                            id="malattia"
+                            name="malattia"
+                            value={formData.malattia}
+                            onChange={handleInputChange}
+                            placeholder="Es. Diabete, Ipertensione..."
+                            className="form-input"
+                        />
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
                         <div className="form-group">
                             <label htmlFor="eta">Età</label>
                             <input
@@ -202,6 +215,32 @@ export default function DataCollector() {
                                 value={formData.eta}
                                 onChange={handleInputChange}
                                 placeholder="Es. 45"
+                                className="form-input"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="peso">Peso in kg</label>
+                            <input
+                                type="text"
+                                id="peso"
+                                name="peso"
+                                value={formData.peso}
+                                onChange={handleInputChange}
+                                placeholder="Es. 73.0"
+                                className="form-input"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="altezza">Altezza in metri</label>
+                            <input
+                                type="text"
+                                id="altezza"
+                                name="altezza"
+                                value={formData.altezza}
+                                onChange={handleInputChange}
+                                placeholder="Es. 1.75"
                                 className="form-input"
                             />
                         </div>
@@ -272,19 +311,114 @@ export default function DataCollector() {
                                 value={formData.provincia}
                                 onChange={handleInputChange}
                                 className="form-select"
-
                             >
                                 <option value="" disabled>Seleziona provincia</option>
-                                <option value="MI">Milano</option>
-                                <option value="RM">Roma</option>
-                                <option value="NA">Napoli</option>
-                                <option value="TO">Torino</option>
-                                <option value="PA">Palermo</option>
-                                <option value="GE">Genova</option>
-                                <option value="BO">Bologna</option>
-                                <option value="FI">Firenze</option>
+                                <option value="AG">Agrigento</option>
+                                <option value="AL">Alessandria</option>
+                                <option value="AN">Ancona</option>
+                                <option value="AO">Aosta</option>
+                                <option value="AR">Arezzo</option>
+                                <option value="AP">Ascoli Piceno</option>
+                                <option value="AT">Asti</option>
+                                <option value="AV">Avellino</option>
                                 <option value="BA">Bari</option>
-                                <option value="CT">Catania</option>
+                                <option value="BT">Barletta-Andria-Trani</option>
+                                <option value="BL">Belluno</option>
+                                <option value="BN">Benevento</option>
+                                <option value="BG">Bergamo</option>
+                                <option value="BI">Biella</option>
+                                <option value="BO">Bologna</option>
+                                <option value="BZ">Bolzano</option>
+                                <option value="BS">Brescia</option>
+                                <option value="BR">Brindisi</option>
+                                <option value="CA">Cagliari</option>
+                                <option value="CL">Caltanissetta</option>
+                                <option value="CB">Campobasso</option>
+                                <option value="CE">Caserta</option>
+                                <option value="CZ">Catanzaro</option>
+                                <option value="CH">Chieti</option>
+                                <option value="CO">Como</option>
+                                <option value="CS">Cosenza</option>
+                                <option value="CR">Cremona</option>
+                                <option value="KR">Crotone</option>
+                                <option value="CN">Cuneo</option>
+                                <option value="EN">Enna</option>
+                                <option value="FM">Fermo</option>
+                                <option value="FE">Ferrara</option>
+                                <option value="FI">Firenze</option>
+                                <option value="FG">Foggia</option>
+                                <option value="FC">Forlì-Cesena</option>
+                                <option value="FR">Frosinone</option>
+                                <option value="GE">Genova</option>
+                                <option value="GO">Gorizia</option>
+                                <option value="GR">Grosseto</option>
+                                <option value="IM">Imperia</option>
+                                <option value="IS">Isernia</option>
+                                <option value="AQ">L'Aquila</option>
+                                <option value="SP">La Spezia</option>
+                                <option value="LT">Latina</option>
+                                <option value="LE">Lecce</option>
+                                <option value="LC">Lecco</option>
+                                <option value="LI">Livorno</option>
+                                <option value="LO">Lodi</option>
+                                <option value="LU">Lucca</option>
+                                <option value="MC">Macerata</option>
+                                <option value="MN">Mantova</option>
+                                <option value="MS">Massa-Carrara</option>
+                                <option value="MT">Matera</option>
+                                <option value="ME">Messina</option>
+                                <option value="MI">Milano</option>
+                                <option value="MO">Modena</option>
+                                <option value="MB">Monza e Brianza</option>
+                                <option value="NA">Napoli</option>
+                                <option value="NO">Novara</option>
+                                <option value="NU">Nuoro</option>
+                                <option value="OR">Oristano</option>
+                                <option value="PD">Padova</option>
+                                <option value="PA">Palermo</option>
+                                <option value="PR">Parma</option>
+                                <option value="PV">Pavia</option>
+                                <option value="PG">Perugia</option>
+                                <option value="PU">Pesaro e Urbino</option>
+                                <option value="PE">Pescara</option>
+                                <option value="PC">Piacenza</option>
+                                <option value="PI">Pisa</option>
+                                <option value="PT">Pistoia</option>
+                                <option value="PN">Pordenone</option>
+                                <option value="PZ">Potenza</option>
+                                <option value="PO">Prato</option>
+                                <option value="RG">Ragusa</option>
+                                <option value="RA">Ravenna</option>
+                                <option value="RC">Reggio Calabria</option>
+                                <option value="RE">Reggio Emilia</option>
+                                <option value="RI">Rieti</option>
+                                <option value="RN">Rimini</option>
+                                <option value="RM">Roma</option>
+                                <option value="RO">Rovigo</option>
+                                <option value="SA">Salerno</option>
+                                <option value="SS">Sassari</option>
+                                <option value="SV">Savona</option>
+                                <option value="SI">Siena</option>
+                                <option value="SR">Siracusa</option>
+                                <option value="SO">Sondrio</option>
+                                <option value="SU">Sud Sardegna</option>
+                                <option value="TA">Taranto</option>
+                                <option value="TE">Teramo</option>
+                                <option value="TR">Terni</option>
+                                <option value="TO">Torino</option>
+                                <option value="TP">Trapani</option>
+                                <option value="TN">Trento</option>
+                                <option value="TV">Treviso</option>
+                                <option value="TS">Trieste</option>
+                                <option value="UD">Udine</option>
+                                <option value="VA">Varese</option>
+                                <option value="VE">Venezia</option>
+                                <option value="VB">Verbano-Cusio-Ossola</option>
+                                <option value="VC">Vercelli</option>
+                                <option value="VR">Verona</option>
+                                <option value="VV">Vibo Valentia</option>
+                                <option value="VI">Vicenza</option>
+                                <option value="VT">Viterbo</option>
                             </select>
                         </div>
                     </div>

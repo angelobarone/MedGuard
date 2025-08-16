@@ -33,8 +33,8 @@
   max-width: 700px;
   min-width: 400px;
 
-  height: 65vh;        /* 60% dell'altezza della viewport */
-  max-height: 800px;
+  height: 70vh;        /* 60% dell'altezza della viewport */
+  max-height: 900px;
   min-height: 300px;
   font-family: Arial, sans-serif;
   background: rgba(255, 255, 255, 0.2);
