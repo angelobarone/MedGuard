@@ -14,8 +14,10 @@
     "framer-motion": "^12.18.1",
     "lucide-react": "^0.532.0",
     "paillier-bigint": "^3.4.3",
+    "path": "^0.12.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-hook-form": "^7.62.0",
     "react-router-dom": "^7.6.2",
     "src": "^1.1.2",
     "tailwind-variants": "^2.0.0"

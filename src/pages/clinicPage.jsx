@@ -21,7 +21,14 @@ export default function ClinicPage() {
     }
 
     PublicKeyFetcher()
-        .then(result => sessionStorage.setItem('publicKey', JSON.stringify(result)));
+        .then(result => {
+            const pkData = {
+                n: result.n.toString(),
+                g: result.g.toString()
+            };
+            sessionStorage.setItem('publicKey', JSON.stringify(pkData));
+            console.log('Public key saved to session storage:', pkData);
+        }).catch(error => console.error(error));
 
     return (
         <div>
