@@ -12,6 +12,7 @@ import {Route, Routes} from "react-router-dom";
 import JoinUs from "./pages/Home.jsx";
 import ClinicPage from "./pages/clinicPage.jsx";
 import DataCollector from "./pages/DataCollector.jsx";
+import React from 'react';
 
 const images = [img1,img2, img4, img5]
 

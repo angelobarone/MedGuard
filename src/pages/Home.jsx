@@ -1,6 +1,7 @@
 import {useNavigate} from "react-router-dom";
 import {BackgroundCarousel} from "../App.jsx";
 import '../stylesheet/App.css'
+import React from 'react';
 
 export default function Home(){
     const navigate = useNavigate();

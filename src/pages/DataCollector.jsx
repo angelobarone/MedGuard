@@ -2,6 +2,7 @@ import '../stylesheet/App.css'
 import {Form, useNavigate} from "react-router-dom";
 import { useState } from 'react';
 import * as paillier from "paillier-bigint"
+import React from 'react';
 
 //mapping per la codifica dei dati
 const genderToInt = g => (g === 'F' ? 1n : 0n); // M=0, F=1

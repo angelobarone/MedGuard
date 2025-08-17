@@ -2,6 +2,7 @@ import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {BackgroundCarousel} from "../App.jsx";
 import '../stylesheet/App.css'
+import React from 'react';
 
 export default function Login(){
     const navigate = useNavigate();

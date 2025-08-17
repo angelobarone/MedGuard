@@ -1,7 +1,124 @@
-import '../stylesheet/App.css'
+import '../stylesheet/App2.css'
 import {useNavigate} from "react-router-dom";
 import * as paillier from "paillier-bigint";
 import {useEffect, useState} from "react";
+import { useMemo } from "react";
+import React from 'react';
+
+const provinceNord = [
+    "TO", // Torino (Piemonte)
+    "VC", // Vercelli
+    "NO", // Novara
+    "CN", // Cuneo
+    "AT", // Asti
+    "AL", // Alessandria
+    "BI", // Biella
+    "VB", // Verbano-Cusio-Ossola
+    "AO", // Aosta (Valle d'Aosta)
+    "MI", // Milano (Lombardia)
+    "VA", // Varese
+    "CO", // Como
+    "SO", // Sondrio
+    "BS", // Brescia
+    "BG", // Bergamo
+    "CR", // Cremona
+    "LC", // Lecco
+    "LO", // Lodi
+    "MN", // Mantova
+    "PV", // Pavia
+    "TN", // Trento (Trentino-Alto Adige)
+    "BZ", // Bolzano
+    "VR", // Verona (Veneto)
+    "VI", // Vicenza
+    "BL", // Belluno
+    "TV", // Treviso
+    "VE", // Venezia
+    "PD", // Padova
+    "RO", // Rovigo
+    "UD", // Udine (Friuli-Venezia Giulia)
+    "GO", // Gorizia
+    "PN", // Pordenone
+    "TS", // Trieste
+    "GE", // Genova (Liguria)
+    "IM", // Imperia
+    "SV", // Savona
+    "SP"  // La Spezia
+];
+
+const provinceCentro = [
+    "BO", // Bologna (Emilia-Romagna)
+    "FE", // Ferrara
+    "FC", // Forlì-Cesena
+    "MO", // Modena
+    "PR", // Parma
+    "PC", // Piacenza
+    "RA", // Ravenna
+    "RE", // Reggio Emilia
+    "RN", // Rimini
+    "FI", // Firenze (Toscana)
+    "AR", // Arezzo
+    "GR", // Grosseto
+    "LI", // Livorno
+    "LU", // Lucca
+    "MS", // Massa-Carrara
+    "PI", // Pisa
+    "PT", // Pistoia
+    "PO", // Prato
+    "SI", // Siena
+    "RM", // Roma (Lazio)
+    "FR", // Frosinone
+    "LT", // Latina
+    "RI", // Rieti
+    "VT", // Viterbo
+    "PG", // Perugia (Umbria)
+    "TR", // Terni
+    "AN", // Ancona (Marche)
+    "AP", // Ascoli Piceno
+    "FM", // Fermo
+    "MC", // Macerata
+    "PU"  // Pesaro e Urbino
+];
+
+const provinceSud = [
+    "AQ", // L'Aquila (Abruzzo)
+    "CH", // Chieti
+    "PE", // Pescara
+    "TE", // Teramo
+    "CB", // Campobasso (Molise)
+    "IS", // Isernia
+    "NA", // Napoli (Campania)
+    "AV", // Avellino
+    "BN", // Benevento
+    "CE", // Caserta
+    "SA", // Salerno
+    "BA", // Bari (Puglia)
+    "BT", // Barletta-Andria-Trani
+    "BR", // Brindisi
+    "FG", // Foggia
+    "LE", // Lecce
+    "TA", // Taranto
+    "PZ", // Potenza (Basilicata)
+    "MT", // Matera
+    "CS", // Cosenza (Calabria)
+    "CZ", // Catanzaro
+    "KR", // Crotone
+    "RC", // Reggio Calabria
+    "VV", // Vibo Valentia
+    "PA", // Palermo (Sicilia)
+    "AG", // Agrigento
+    "CL", // Caltanissetta
+    "CT", // Catania
+    "EN", // Enna
+    "ME", // Messina
+    "RG", // Ragusa
+    "SR", // Siracusa
+    "TP", // Trapani
+    "CA", // Cagliari (Sardegna)
+    "NU", // Nuoro
+    "OR", // Oristano
+    "SS", // Sassari
+    "SU"  // Sud Sardegna
+];
 
 export default function DataCollector() {
     const user = sessionStorage.getItem('username')
@@ -11,6 +128,7 @@ export default function DataCollector() {
     const [needUpdate, setNeedUpdate] = useState(true);
     const [decryptedData, setDecryptedData] = useState([]);
     const [isDecrypting, setIsDecrypting] = useState(false);
+
 
     const logout = () => {
         sessionStorage.clear();
@@ -99,6 +217,263 @@ export default function DataCollector() {
     };
 
     console.log(decryptedData);
+    const generalStats = useMemo(() => {
+        let n_pazienti = 0;
+        let sum_eta = 0;
+        let sum_colesterolo = 0;
+        let sum_pressione = 0;
+        let sum_glucosio = 0;
+        let sum_fumatore = 0;
+        let sum_peso = 0;
+        let sum_altezza = 0;
+        let sum_donne = 0;
+        let sum_uomini = 0;
+        let malattie = [];
+        let sum_diabete = 0;
+
+        decryptedData.forEach((row) => {
+            n_pazienti += row.count_sum;
+            sum_eta += row.eta_sum;
+            sum_colesterolo += row.colesterolo_sum;
+            sum_pressione += row.pressione_sum;
+            sum_glucosio += row.glucosio_sum;
+            sum_fumatore += row.fumatore_sum;
+            sum_peso += row.peso_sum;
+            sum_altezza += row.altezza_sum;
+            sum_donne += row.genere_sum;
+            sum_uomini = n_pazienti - sum_donne;
+
+            let flag = false;
+            malattie.forEach((malattia) => {
+                if(malattia.malattia === row.malattia){
+                    malattia.infetti += row.count_sum; // Modifica malattia, non malattie
+                    flag = true;
+                }
+            });
+
+            if(!flag){
+                malattie.push({
+                    malattia: row.malattia,
+                    infetti: row.count_sum
+                });
+            }
+        });
+        malattie.forEach((malattia) => {
+            if(malattia.malattia === 'Diabete'){
+                sum_diabete = malattia.infetti;
+            }
+        })
+        return{
+            pazienti_totali: n_pazienti,
+            average_eta: sum_eta / n_pazienti,
+            average_colesterolo: sum_colesterolo / n_pazienti,
+            average_pressione: sum_pressione / n_pazienti,
+            average_glucosio: sum_glucosio / n_pazienti,
+            perc_fumatore: sum_fumatore / n_pazienti * 100,
+            average_peso: sum_peso / n_pazienti,
+            average_altezza: sum_altezza / n_pazienti,
+            perc_donne: sum_donne / n_pazienti * 100,
+            perc_uomini: sum_uomini / n_pazienti * 100,
+            perc_diabete: sum_diabete / n_pazienti * 100,
+            malattie: malattie,
+        }
+    }, [decryptedData]);
+
+    const nordData = useMemo (() => {
+        let n_pazienti = 0;
+        let sum_eta = 0;
+        let sum_colesterolo = 0;
+        let sum_pressione = 0;
+        let sum_glucosio = 0;
+        let sum_fumatore = 0;
+        let sum_peso = 0;
+        let sum_altezza = 0;
+        let sum_donne = 0;
+        let sum_uomini = 0;
+        let malattie = [];
+        let sum_diabete = 0;
+
+        decryptedData.forEach((row) => {
+            if(provinceNord.includes(row.provincia)) {
+                n_pazienti += row.count_sum;
+                sum_eta += row.eta_sum;
+                sum_colesterolo += row.colesterolo_sum;
+                sum_pressione += row.pressione_sum;
+                sum_glucosio += row.glucosio_sum;
+                sum_fumatore += row.fumatore_sum;
+                sum_peso += row.peso_sum;
+                sum_altezza += row.altezza_sum;
+                sum_donne += row.genere_sum;
+                sum_uomini = n_pazienti - sum_donne;
+
+                let flag = false;
+                malattie.forEach((malattia) => {
+                    if(malattia.malattia === row.malattia){
+                        malattia.infetti += row.count_sum; // Modifica malattia, non malattie
+                        flag = true;
+                    }
+                });
+
+                if(!flag){
+                    malattie.push({
+                        malattia: row.malattia,
+                        infetti: row.count_sum
+                    });
+                }
+            }
+        });
+        console.log(malattie);
+        malattie.forEach((malattia) => {
+            if(malattia.malattia === 'Diabete'){
+                console.log("aaaaaaaaaaaaaaaaaa");
+                sum_diabete = malattia.infetti;
+            }
+        })
+        return{
+            pazienti_totali: n_pazienti,
+            average_eta: sum_eta / n_pazienti,
+            average_colesterolo: sum_colesterolo / n_pazienti,
+            average_pressione: sum_pressione / n_pazienti,
+            average_glucosio: sum_glucosio / n_pazienti,
+            perc_fumatore: sum_fumatore / n_pazienti * 100,
+            average_peso: sum_peso / n_pazienti,
+            average_altezza: sum_altezza / n_pazienti,
+            perc_donne: sum_donne / n_pazienti * 100,
+            perc_uomini: sum_uomini / n_pazienti * 100,
+            perc_diabete: sum_diabete / n_pazienti * 100,
+            malattie: malattie,
+        }
+    }, [decryptedData]);
+
+    const centroData = useMemo( () => {
+        let n_pazienti = 0;
+        let sum_eta = 0;
+        let sum_colesterolo = 0;
+        let sum_pressione = 0;
+        let sum_glucosio = 0;
+        let sum_fumatore = 0;
+        let sum_peso = 0;
+        let sum_altezza = 0;
+        let sum_donne = 0;
+        let sum_uomini = 0;
+        let malattie = [];
+        let sum_diabete = 0;
+
+        decryptedData.forEach((row) => {
+            if(provinceCentro.includes(row.provincia)) {
+                n_pazienti += row.count_sum;
+                sum_eta += row.eta_sum;
+                sum_colesterolo += row.colesterolo_sum;
+                sum_pressione += row.pressione_sum;
+                sum_glucosio += row.glucosio_sum;
+                sum_fumatore += row.fumatore_sum;
+                sum_peso += row.peso_sum;
+                sum_altezza += row.altezza_sum;
+                sum_donne += row.genere_sum;
+                sum_uomini = n_pazienti - sum_donne;
+
+                let flag = false;
+                malattie.forEach((malattia) => {
+                    if(malattia.malattia === row.malattia){
+                        malattia.infetti += row.count_sum; // Modifica malattia, non malattie
+                        flag = true;
+                    }
+                });
+
+                if(!flag){
+                    malattie.push({
+                        malattia: row.malattia,
+                        infetti: row.count_sum
+                    });
+                }
+            }
+        });
+        malattie.forEach((malattia) => {
+            if(malattia.malattia === 'Diabete'){
+                sum_diabete = malattia.infetti;
+            }
+        })
+        return{
+            pazienti_totali: n_pazienti,
+            average_eta: sum_eta / n_pazienti,
+            average_colesterolo: sum_colesterolo / n_pazienti,
+            average_pressione: sum_pressione / n_pazienti,
+            average_glucosio: sum_glucosio / n_pazienti,
+            perc_fumatore: sum_fumatore / n_pazienti * 100,
+            average_peso: sum_peso / n_pazienti,
+            average_altezza: sum_altezza / n_pazienti,
+            perc_donne: sum_donne / n_pazienti * 100,
+            perc_uomini: sum_uomini / n_pazienti * 100,
+            perc_diabete: sum_diabete / n_pazienti * 100,
+            malattie: malattie,
+        }
+
+    }, [decryptedData]);
+
+    const sudData = useMemo( () => {
+        let n_pazienti = 0;
+        let sum_eta = 0;
+        let sum_colesterolo = 0;
+        let sum_pressione = 0;
+        let sum_glucosio = 0;
+        let sum_fumatore = 0;
+        let sum_peso = 0;
+        let sum_altezza = 0;
+        let sum_donne = 0;
+        let sum_uomini = 0;
+        let malattie = [];
+        let sum_diabete = 0;
+
+        decryptedData.forEach((row) => {
+            if(provinceSud.includes(row.provincia)) {
+                n_pazienti += row.count_sum;
+                sum_eta += row.eta_sum;
+                sum_colesterolo += row.colesterolo_sum;
+                sum_pressione += row.pressione_sum;
+                sum_glucosio += row.glucosio_sum;
+                sum_fumatore += row.fumatore_sum;
+                sum_peso += row.peso_sum;
+                sum_altezza += row.altezza_sum;
+                sum_donne += row.genere_sum;
+                sum_uomini = n_pazienti - sum_donne;
+
+                let flag = false;
+                malattie.forEach((malattia) => {
+                    if(malattia.malattia === row.malattia){
+                        malattia.infetti += row.count_sum; // Modifica malattia, non malattie
+                        flag = true;
+                    }
+                });
+
+                if(!flag){
+                    malattie.push({
+                        malattia: row.malattia,
+                        infetti: row.count_sum
+                    });
+                }
+            }
+        });
+        malattie.forEach((malattia) => {
+            if(malattia.malattia === 'Diabete'){
+                sum_diabete = malattia.infetti;
+            }
+        })
+        return{
+            pazienti_totali: n_pazienti,
+            average_eta: sum_eta / n_pazienti,
+            average_colesterolo: sum_colesterolo / n_pazienti,
+            average_pressione: sum_pressione / n_pazienti,
+            average_glucosio: sum_glucosio / n_pazienti,
+            perc_fumatore: sum_fumatore / n_pazienti * 100,
+            average_peso: sum_peso / n_pazienti,
+            average_altezza: sum_altezza / n_pazienti,
+            perc_donne: sum_donne / n_pazienti * 100,
+            perc_uomini: sum_uomini / n_pazienti * 100,
+            perc_diabete: sum_diabete / n_pazienti * 100,
+            malattie: malattie,
+        }
+
+    }, [decryptedData]);
 
     return(
         <div>
@@ -118,6 +493,66 @@ export default function DataCollector() {
                             <p>Decrittazione in corso... Attendere prego</p>
                         </div>
                     )}
+                </div>
+                <h2>Panoramica Pazienti Nazionale</h2>
+                <div className="row1">
+                    <div className="stat">
+                        <h2>Pazienti totali</h2>
+                        <p>{generalStats.pazienti_totali}</p>
+                    </div>
+                    <div className="stat">
+                        <h2>Età media</h2>
+                        <p>{generalStats.average_eta} </p>
+                    </div>
+                    <div className="stat">
+                        <h2>Glicemia media</h2>
+                        <p>{generalStats.average_glucosio} mg/dl</p>
+                    </div>
+                    <div className="stat">
+                        <h2>Colesterolo media</h2>
+                        <p>{generalStats.average_colesterolo} mg/dl</p>
+                    </div>
+                    <div className="stat">
+                        <h2>Prevalenza Diabete</h2>
+                        <p>{generalStats.perc_diabete} %</p>
+                    </div>
+                    <div className="stat">
+                        <h2>Percentuale Fumatori</h2>
+                        <p>{generalStats.perc_fumatore} %</p>
+                    </div>
+                    <div className="stat">
+                        <h2>Genere</h2>
+                        <p>Uomini: {generalStats.perc_uomini} %
+                            Donne: {generalStats.perc_donne} % </p>
+                    </div>
+                </div>
+                <h2>Report per luogo di provenienza</h2>
+                <div className="row2">
+                    <div className="stat">
+                        <h2>Nord</h2>
+                        <p>{nordData.pazienti_totali} </p>
+                        <h2>pazienti</h2>
+                    </div>
+                    <div className="stat">
+                        <h2>Centro</h2>
+                        <p>{centroData.pazienti_totali} </p>
+                        <h2>pazienti</h2>
+                    </div>
+                    <div className="stat">
+                        <h2>Sud</h2>
+                        <p>{sudData.pazienti_totali} </p>
+                        <h2>pazienti</h2>
+                    </div>
+                </div>
+                <h2>Report per malattia</h2>
+                <div className="row2">
+                    {generalStats.malattie.map((malattia) => (
+                        <div className="stat">
+                            <h2>{malattia.malattia}</h2>
+                            <p>{malattia.infetti}</p>
+                            <h2>pazienti</h2>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

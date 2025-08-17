@@ -1,6 +1,6 @@
 import '../stylesheet/App.css'
 import {useNavigate} from "react-router-dom";
-import * as paillier from "paillier-bigint";
+import React from 'react';
 
 
 export default function AuthorizedPage() {

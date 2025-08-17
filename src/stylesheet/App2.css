@@ -21,30 +21,44 @@
 }
 
 .container {
-  position: fixed;
-  top: 50%;
-  left:50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 80vw;
-  max-width: 700px;
-  min-width: 400px;
-
-  height: 70vh;
-  max-height: 900px;
-  min-height: 300px;
-  font-family: Arial, sans-serif;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 50px;
-  border-radius: 30px;
-  text-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80vw;
+    max-width: 700px;
+    min-width: 400px;
+    /* Rimuovi altezze fisse/minime */
+    font-family: Arial, sans-serif;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 50px;
+    border-radius: 30px;
+    text-align: center;
+    /* Nuove proprietà per contenuto dinamico: */
+    justify-content: flex-start; /* Allinea il contenuto in alto */
+    min-height: auto; /* Rimuove ogni altezza minima */
+    overflow-y: auto; /* Abilita scroll se necessario */
+    max-height: 90vh; /* Prevenire overflow verticale eccessivo */
 }
 
+.container::-webkit-scrollbar {
+    width: 8px; /* Larghezza della scrollbar */
+    background-color: transparent; /* Sfondo trasparente */
+}
+
+.container::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3); /* Barra semi-trasparente */
+    border-radius: 4px; /* Bordi arrotondati */
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5); /* Effetto hover */
+}
 .button {
   font-size: 18px;
   cursor: pointer;
@@ -213,4 +227,73 @@ label{
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+.row1 {
+    display: flex;
+    gap: 20px; /* Spazio tra le card */
+    padding: 20px;
+    flex-wrap: wrap; /* Responsive: va a capo su schermi piccoli */
+    justify-content: center; /* Centra le card orizzontalmente */
+}
+
+/* Stile delle card statistiche */
+.stat {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    min-width: 100px; /* Larghezza minima */
+    max-width: 200px;
+    flex: 1; /* Cresce per occupare spazio disponibile */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    /* Allineamento contenuto */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Effetto hover per interattività */
+.stat:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Stile del titolo */
+.stat h2 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* Stile del valore */
+.stat p {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* Versione mobile */
+@media (max-width: 768px) {
+    .row1 {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat {
+        width: 80%;
+        max-width: none;
+    }
+}
+
+.row2 {
+    display: flex;
+    gap: 20px; /* Spazio tra le card */
+    padding: 20px;
+    flex-wrap: wrap; /* Responsive: va a capo su schermi piccoli */
+    justify-content: center; /* Centra le card orizzontalmente */
 }
