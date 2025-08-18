@@ -42,8 +42,6 @@ export default function ClinicPage() {
             <div className = "container fade-in">
                 <img src="/medguard.png" alt="logo" height="300px" />
                 <button className="button" onClick={inserisciDati}>Inserisci nuovi dati</button>
-                <button className="button">Consulta i Dati pubblicati 🚧</button>
-                <button className="button">Assistente Virtuale 🚧</button>
             </div>
         </div>
     );

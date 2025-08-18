@@ -120,8 +120,14 @@ const provinceSud = [
     "SU"  // Sud Sardegna
 ];
 
+function getLocation(provincia){
+    if(provinceNord.includes(provincia)) return "Nord";
+    else if(provinceCentro.includes(provincia)) return "Centro";
+    else if(provinceSud.includes(provincia)) return "Sud";
+    else return "N/A";
+}
 export default function DataCollector() {
-    const user = sessionStorage.getItem('username')
+    const user = sessionStorage.getItem('username');
     const navigate = useNavigate();
     const pkData = JSON.parse(sessionStorage.getItem('privateKey'));
     const [isDownloading, setIsDownloading] = useState(false);
@@ -137,6 +143,19 @@ export default function DataCollector() {
 
     const backHome = () => {
         navigate('/authorizedPage');
+    }
+
+    const northPage = () => {
+        navigate('/localePage', {state: {data: nordData, locale: "Nord"}});
+    }
+    const centroPage = () => {
+        navigate('/localePage', {state: {data: centroData, locale: "Centro"}});
+    }
+    const southPage = () => {
+        navigate('/localePage', {state: {data: sudData, locale: "Sud"}});
+    }
+    const diseasePage = (disease) => {
+        navigate('/diseasePage', {state: {data: diseaseData(disease), disease: disease}})
     }
 
     useEffect(() => {
@@ -246,7 +265,7 @@ export default function DataCollector() {
             let flag = false;
             malattie.forEach((malattia) => {
                 if(malattia.malattia === row.malattia){
-                    malattia.infetti += row.count_sum; // Modifica malattia, non malattie
+                    malattia.infetti += row.count_sum;
                     flag = true;
                 }
             });
@@ -309,7 +328,7 @@ export default function DataCollector() {
                 let flag = false;
                 malattie.forEach((malattia) => {
                     if(malattia.malattia === row.malattia){
-                        malattia.infetti += row.count_sum; // Modifica malattia, non malattie
+                        malattia.infetti += row.count_sum;
                         flag = true;
                     }
                 });
@@ -375,7 +394,7 @@ export default function DataCollector() {
                 let flag = false;
                 malattie.forEach((malattia) => {
                     if(malattia.malattia === row.malattia){
-                        malattia.infetti += row.count_sum; // Modifica malattia, non malattie
+                        malattia.infetti += row.count_sum;
                         flag = true;
                     }
                 });
@@ -440,7 +459,7 @@ export default function DataCollector() {
                 let flag = false;
                 malattie.forEach((malattia) => {
                     if(malattia.malattia === row.malattia){
-                        malattia.infetti += row.count_sum; // Modifica malattia, non malattie
+                        malattia.infetti += row.count_sum;
                         flag = true;
                     }
                 });
@@ -475,6 +494,74 @@ export default function DataCollector() {
 
     }, [decryptedData]);
 
+    const diseaseData = (disease) => {
+        let n_pazienti = 0;
+        let sum_eta = 0;
+        let sum_colesterolo = 0;
+        let sum_pressione = 0;
+        let sum_glucosio = 0;
+        let sum_fumatore = 0;
+        let sum_peso = 0;
+        let sum_altezza = 0;
+        let sum_donne = 0;
+        let sum_uomini = 0;
+        let n_nord = 0;
+        let n_centro = 0;
+        let n_sud = 0;
+        let sum_tosse = 0;
+        let sum_febbre = 0;
+        let sum_respiratorie = 0;
+        let sum_stanchezza = 0;
+
+        decryptedData.forEach((row) => {
+            if(row.malattia === disease) {
+                n_pazienti += row.count_sum;
+                sum_eta += row.eta_sum;
+                sum_colesterolo += row.colesterolo_sum;
+                sum_pressione += row.pressione_sum;
+                sum_glucosio += row.glucosio_sum;
+                sum_fumatore += row.fumatore_sum;
+                sum_peso += row.peso_sum;
+                sum_altezza += row.altezza_sum;
+                sum_donne += row.genere_sum;
+                sum_uomini = n_pazienti - sum_donne;
+                sum_tosse += row.tosse_sum;
+                sum_febbre += row.febbre_sum;
+                sum_respiratorie += row.difficolta_sum
+                sum_stanchezza += row.stanchezza_sum;
+
+                if(getLocation(row.provincia) === 'Nord'){
+                    n_nord = n_nord + 1;
+                }
+                if(getLocation(row.provincia) === 'Centro'){
+                    n_centro = n_centro + 1;
+                }
+                if(getLocation(row.provincia) === 'Sud'){
+                    n_sud = n_sud + 1;
+                }
+            }
+        });
+        return{
+            pazienti_totali: n_pazienti,
+            average_eta: sum_eta / n_pazienti,
+            average_colesterolo: sum_colesterolo / n_pazienti,
+            average_pressione: sum_pressione / n_pazienti,
+            average_glucosio: sum_glucosio / n_pazienti,
+            perc_fumatore: sum_fumatore / n_pazienti * 100,
+            average_peso: sum_peso / n_pazienti,
+            average_altezza: sum_altezza / n_pazienti,
+            perc_donne: sum_donne / n_pazienti * 100,
+            perc_uomini: sum_uomini / n_pazienti * 100,
+            perc_tosse: sum_tosse / n_pazienti * 100,
+            perc_febbre: sum_febbre / n_pazienti * 100,
+            perc_respiratorie: sum_respiratorie / n_pazienti *100,
+            perc_stanchezza: sum_stanchezza / n_pazienti * 100,
+            n_nord: n_nord,
+            n_centro: n_centro,
+            n_sud: n_sud
+        }
+    }
+
     return(
         <div>
             <header className="header">
@@ -506,11 +593,11 @@ export default function DataCollector() {
                     </div>
                     <div className="stat">
                         <h2>Glicemia media</h2>
-                        <p>{generalStats.average_glucosio} mg/dl</p>
+                        <p>{generalStats.average_glucosio / 100} mg/dl</p>
                     </div>
                     <div className="stat">
                         <h2>Colesterolo media</h2>
-                        <p>{generalStats.average_colesterolo} mg/dl</p>
+                        <p>{generalStats.average_colesterolo / 100} mg/dl</p>
                     </div>
                     <div className="stat">
                         <h2>Prevalenza Diabete</h2>
@@ -528,17 +615,17 @@ export default function DataCollector() {
                 </div>
                 <h2>Report per luogo di provenienza</h2>
                 <div className="row2">
-                    <div className="stat">
+                    <div className="stat" onClick={northPage}>
                         <h2>Nord</h2>
                         <p>{nordData.pazienti_totali} </p>
                         <h2>pazienti</h2>
                     </div>
-                    <div className="stat">
+                    <div className="stat" onClick={centroPage}>
                         <h2>Centro</h2>
                         <p>{centroData.pazienti_totali} </p>
                         <h2>pazienti</h2>
                     </div>
-                    <div className="stat">
+                    <div className="stat" onClick={southPage}>
                         <h2>Sud</h2>
                         <p>{sudData.pazienti_totali} </p>
                         <h2>pazienti</h2>
@@ -547,10 +634,10 @@ export default function DataCollector() {
                 <h2>Report per malattia</h2>
                 <div className="row2">
                     {generalStats.malattie.map((malattia) => (
-                        <div className="stat">
+                        <div className="stat" onClick={() => diseasePage(malattia.malattia)}>
                             <h2>{malattia.malattia}</h2>
-                            <p>{malattia.infetti}</p>
-                            <h2>pazienti</h2>
+                            <p>{malattia.infetti / generalStats.pazienti_totali * 100} %</p>
+                            <h2>dei pazienti</h2>
                         </div>
                     ))}
                 </div>

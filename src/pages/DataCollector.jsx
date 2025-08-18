@@ -551,7 +551,7 @@ export default function DataCollector() {
                                     name="pressioneSangue"
                                     value={formData.pressioneSangue}
                                     onChange={handleInputChange}
-                                    placeholder="Es. 120/80"
+                                    placeholder="Massima"
                                     className="form-input"
                                 />
                             </div>
