@@ -126,7 +126,7 @@ function getLocation(provincia){
     else if(provinceSud.includes(provincia)) return "Sud";
     else return "N/A";
 }
-export default function DataCollector() {
+export default function DataSeeker() {
     const user = sessionStorage.getItem('username');
     const navigate = useNavigate();
     const pkData = JSON.parse(sessionStorage.getItem('privateKey'));
