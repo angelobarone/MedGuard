@@ -1,8 +1,5 @@
 import '../stylesheet/App2.css'
 import {useLocation, useNavigate} from "react-router-dom";
-import * as paillier from "paillier-bigint";
-import {useEffect, useState} from "react";
-import { useMemo } from "react";
 import React from 'react';
 
 
@@ -27,11 +24,16 @@ export default function DiseasePage() {
     return(
         <div>
             <header className="header">
-                <button className="options" onClick={backHome}>Home</button>
-                <span style={{ marginLeft: '15px' }}>Logged in as: </span>
-                <button className="user options" style={{margin: '0px', marginRight: '15px'}}>{user} 🚧</button>
-                <button className="options">Assistenza clienti 🚧</button>
-                <button className="options" onClick={logout}>Logout</button>
+                <div className="options-container">
+                    <button className="options" onClick={backHome}>Home</button>
+                    <span> | </span>
+                    <span style={{ marginLeft: '15px' }}>Logged in as: </span>
+                    <button className="user options" style={{margin: '0px', marginRight: '15px'}}>{user} 🚧</button>
+                    <span> | </span>
+                    <button className="options">Assistenza clienti 🚧</button>
+                    <span> | </span>
+                    <button className="options" onClick={logout}>Logout</button>
+                </div>
             </header>
             <div className="container fade-in">
                 <h1>Dashboard Analisi</h1>
@@ -43,43 +45,57 @@ export default function DiseasePage() {
                     </div>
                     <div className="stat">
                         <h2>Età media</h2>
-                        <p>{data.average_eta} </p>
+                        <p>{data.average_eta.toFixed(0)} </p>
                     </div>
                     <div className="stat">
                         <h2>Glicemia media</h2>
-                        <p>{data.average_glucosio / 100} mg/dl</p>
+                        <p>{(data.average_glucosio / 100).toFixed(3)} mg/dl</p>
                     </div>
                     <div className="stat">
                         <h2>Colesterolo media</h2>
-                        <p>{data.average_colesterolo / 100} mg/dl</p>
+                        <p>{(data.average_colesterolo / 100).toFixed(3)} mg/dl</p>
                     </div>
                     <div className="stat">
                         <h2>Percentuale Fumatori</h2>
-                        <p>{data.perc_fumatore} %</p>
+                        <p>{(data.perc_fumatore).toFixed(3)} %</p>
                     </div>
                     <div className="stat">
-                        <h2>Genere</h2>
-                        <p>Uomini: {data.perc_uomini} %
-                            Donne: {data.perc_donne} % </p>
+                        <h2>Uomini</h2>
+                        <p>{data.perc_uomini.toFixed(3)} % </p>
+                    </div>
+                    <div className="stat">
+                        <h2>Donne</h2>
+                        <p>{data.perc_donne.toFixed(3)} % </p>
                     </div>
                 </div>
                 <h2>Sintomi</h2>
                 <div className="row2">
                     <div className="stat">
                         <h2>Tosse</h2>
-                        <p>{data.perc_tosse} %</p>
+                        <p>{data.perc_tosse.toFixed(3)} %</p>
                     </div>
                     <div className="stat">
                         <h2>Febbre</h2>
-                        <p>{data.perc_febbre} %</p>
+                        <p>{data.perc_febbre.toFixed(3)} %</p>
                     </div>
                     <div className="stat">
                         <h2>Difficoltà Respiratorie</h2>
-                        <p>{data.perc_respiratorie} %</p>
+                        <p>{data.perc_respiratorie.toFixed(3)} %</p>
                     </div>
                     <div className="stat">
                         <h2>Stanchezza</h2>
-                        <p>{data.perc_stanchezza} %</p>
+                        <p>{data.perc_stanchezza.toFixed(3)} %</p>
+                    </div>
+                </div>
+                <h2>Caratteristiche fisiche</h2>
+                <div className="row2">
+                    <div className="stat">
+                        <h2>Peso medio</h2>
+                        <p>{data.average_peso.toFixed(1)} kg</p>
+                    </div>
+                    <div className="stat">
+                        <h2>Altezza media</h2>
+                        <p>{data.average_altezza.toFixed(1)} cm</p>
                     </div>
                 </div>
                 <h2>Luogo</h2>

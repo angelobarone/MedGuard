@@ -11,7 +11,7 @@
   width: 100%;
   height: fit-content;
   color: #00324D;
-  text-align: start;
+  text-align: center;
   padding : 10px;
   z-index: 10;
   font-family: Arial, sans-serif;
@@ -45,6 +45,7 @@
     overflow-y: auto; /* Abilita scroll se necessario */
     max-height: 90vh; /* Prevenire overflow verticale eccessivo */
 }
+
 
 .container::-webkit-scrollbar {
     width: 8px; /* Larghezza della scrollbar */

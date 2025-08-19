@@ -5,133 +5,12 @@ import {useEffect, useState} from "react";
 import { useMemo } from "react";
 import React from 'react';
 
-const provinceNord = [
-    "TO", // Torino (Piemonte)
-    "VC", // Vercelli
-    "NO", // Novara
-    "CN", // Cuneo
-    "AT", // Asti
-    "AL", // Alessandria
-    "BI", // Biella
-    "VB", // Verbano-Cusio-Ossola
-    "AO", // Aosta (Valle d'Aosta)
-    "MI", // Milano (Lombardia)
-    "VA", // Varese
-    "CO", // Como
-    "SO", // Sondrio
-    "BS", // Brescia
-    "BG", // Bergamo
-    "CR", // Cremona
-    "LC", // Lecco
-    "LO", // Lodi
-    "MN", // Mantova
-    "PV", // Pavia
-    "TN", // Trento (Trentino-Alto Adige)
-    "BZ", // Bolzano
-    "VR", // Verona (Veneto)
-    "VI", // Vicenza
-    "BL", // Belluno
-    "TV", // Treviso
-    "VE", // Venezia
-    "PD", // Padova
-    "RO", // Rovigo
-    "UD", // Udine (Friuli-Venezia Giulia)
-    "GO", // Gorizia
-    "PN", // Pordenone
-    "TS", // Trieste
-    "GE", // Genova (Liguria)
-    "IM", // Imperia
-    "SV", // Savona
-    "SP"  // La Spezia
-];
 
-const provinceCentro = [
-    "BO", // Bologna (Emilia-Romagna)
-    "FE", // Ferrara
-    "FC", // Forlì-Cesena
-    "MO", // Modena
-    "PR", // Parma
-    "PC", // Piacenza
-    "RA", // Ravenna
-    "RE", // Reggio Emilia
-    "RN", // Rimini
-    "FI", // Firenze (Toscana)
-    "AR", // Arezzo
-    "GR", // Grosseto
-    "LI", // Livorno
-    "LU", // Lucca
-    "MS", // Massa-Carrara
-    "PI", // Pisa
-    "PT", // Pistoia
-    "PO", // Prato
-    "SI", // Siena
-    "RM", // Roma (Lazio)
-    "FR", // Frosinone
-    "LT", // Latina
-    "RI", // Rieti
-    "VT", // Viterbo
-    "PG", // Perugia (Umbria)
-    "TR", // Terni
-    "AN", // Ancona (Marche)
-    "AP", // Ascoli Piceno
-    "FM", // Fermo
-    "MC", // Macerata
-    "PU"  // Pesaro e Urbino
-];
-
-const provinceSud = [
-    "AQ", // L'Aquila (Abruzzo)
-    "CH", // Chieti
-    "PE", // Pescara
-    "TE", // Teramo
-    "CB", // Campobasso (Molise)
-    "IS", // Isernia
-    "NA", // Napoli (Campania)
-    "AV", // Avellino
-    "BN", // Benevento
-    "CE", // Caserta
-    "SA", // Salerno
-    "BA", // Bari (Puglia)
-    "BT", // Barletta-Andria-Trani
-    "BR", // Brindisi
-    "FG", // Foggia
-    "LE", // Lecce
-    "TA", // Taranto
-    "PZ", // Potenza (Basilicata)
-    "MT", // Matera
-    "CS", // Cosenza (Calabria)
-    "CZ", // Catanzaro
-    "KR", // Crotone
-    "RC", // Reggio Calabria
-    "VV", // Vibo Valentia
-    "PA", // Palermo (Sicilia)
-    "AG", // Agrigento
-    "CL", // Caltanissetta
-    "CT", // Catania
-    "EN", // Enna
-    "ME", // Messina
-    "RG", // Ragusa
-    "SR", // Siracusa
-    "TP", // Trapani
-    "CA", // Cagliari (Sardegna)
-    "NU", // Nuoro
-    "OR", // Oristano
-    "SS", // Sassari
-    "SU"  // Sud Sardegna
-];
-
-function getLocation(provincia){
-    if(provinceNord.includes(provincia)) return "Nord";
-    else if(provinceCentro.includes(provincia)) return "Centro";
-    else if(provinceSud.includes(provincia)) return "Sud";
-    else return "N/A";
-}
 export default function DataSeeker() {
     const user = sessionStorage.getItem('username');
     const navigate = useNavigate();
     const pkData = JSON.parse(sessionStorage.getItem('privateKey'));
     const [isDownloading, setIsDownloading] = useState(false);
-    const [needUpdate, setNeedUpdate] = useState(true);
     const [decryptedData, setDecryptedData] = useState([]);
     const [isDecrypting, setIsDecrypting] = useState(false);
 
@@ -159,59 +38,61 @@ export default function DataSeeker() {
     }
 
     useEffect(() => {
-        if(!needUpdate) return;
-        const fetchData = async () => {
-            try {
-                setIsDownloading(true);
-                const response = await fetch('http://127.0.0.1:5000/encDataSender', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ user: user })
-                });
-                const result = await response.json();
+        const savedData = sessionStorage.getItem('decryptedData');
+        if(savedData !== null) {
+            setDecryptedData(JSON.parse(savedData));
+        } else {
+            const fetchData = async () => {
+                try {
+                    setIsDownloading(true);
+                    const response = await fetch('http://127.0.0.1:5000/encDataSender', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ user: user })
+                    });
+                    const result = await response.json();
 
-                if(result.success) {
-                    setIsDecrypting(true);
-                    setTimeout(async () => {
-                        try{
-                            const decrypted = await Promise.all(
-                                result.data.map(async (row) => ({
-                                    provincia: row.provincia,
-                                    malattia: row.malattia,
-                                    mese: row.mese,
-                                    anno: row.anno,
-                                    count_sum: await decryptPaillierValue(row.count_sum),
-                                    eta_sum: await decryptPaillierValue(row.eta_sum),
-                                    colesterolo_sum: await decryptPaillierValue(row.colesterolo_sum),
-                                    pressione_sum: await decryptPaillierValue(row.pressione_sum),
-                                    glucosio_sum: await decryptPaillierValue(row.glucosio_sum),
-                                    fumatore_sum: await decryptPaillierValue(row.fumatore_sum),
-                                    febbre_sum: await decryptPaillierValue(row.febbre_sum),
-                                    tosse_sum: await decryptPaillierValue(row.tosse_sum),
-                                    difficolta_sum: await decryptPaillierValue(row.difficolta_sum),
-                                    stanchezza_sum: await decryptPaillierValue(row.stanchezza_sum),
-                                    genere_sum: await decryptPaillierValue(row.genere_sum),
-                                    peso_sum: await decryptPaillierValue(row.peso_sum),
-                                    altezza_sum: await decryptPaillierValue(row.altezza_sum)
-                                }))
-                            );
-                            setDecryptedData(decrypted);
-                        } catch (error) {
-                            console.error('Errore nella decrittazione:', error);
-                        } finally {
-                            setIsDecrypting(false);
-                            setNeedUpdate(false);
-                        }
-                    }, 100);
+                    if(result.success) {
+                        setIsDecrypting(true);
+                        setTimeout(async () => {
+                            try {
+                                const decrypted = await Promise.all(
+                                    result.data.map(async (row) => ({
+                                        macroarea: row.macroarea,
+                                        malattia: row.malattia,
+                                        count_sum: await decryptPaillierValue(row.count_sum),
+                                        eta_sum: await decryptPaillierValue(row.eta_sum),
+                                        colesterolo_sum: await decryptPaillierValue(row.colesterolo_sum),
+                                        pressione_sum: await decryptPaillierValue(row.pressione_sum),
+                                        glucosio_sum: await decryptPaillierValue(row.glucosio_sum),
+                                        fumatore_sum: await decryptPaillierValue(row.fumatore_sum),
+                                        febbre_sum: await decryptPaillierValue(row.febbre_sum),
+                                        tosse_sum: await decryptPaillierValue(row.tosse_sum),
+                                        difficolta_sum: await decryptPaillierValue(row.difficolta_sum),
+                                        stanchezza_sum: await decryptPaillierValue(row.stanchezza_sum),
+                                        genere_sum: await decryptPaillierValue(row.genere_sum),
+                                        peso_sum: await decryptPaillierValue(row.peso_sum),
+                                        altezza_sum: await decryptPaillierValue(row.altezza_sum)
+                                    }))
+                                );
+                                setDecryptedData(decrypted);
+                                sessionStorage.setItem('decryptedData', JSON.stringify(decrypted));
+                            } catch (error) {
+                                console.error('Errore nella decrittazione:', error);
+                            } finally {
+                                setIsDecrypting(false);
+                            }
+                        }, 100);
+                    }
+                } catch (error) {
+                    console.error('Errore:', error);
+                } finally {
+                    setIsDownloading(false);
                 }
-            } catch (error) {
-                console.error('Errore:', error);
-            } finally {
-                setIsDownloading(false);
-            }
-        };
-        fetchData();
-    }, [needUpdate, user]);
+            };
+            fetchData();
+        }
+    }, [user]);
 
     // Funzione di decrittazione
     const decryptPaillierValue = async (encryptedHex) => {
@@ -313,7 +194,7 @@ export default function DataSeeker() {
         let sum_diabete = 0;
 
         decryptedData.forEach((row) => {
-            if(provinceNord.includes(row.provincia)) {
+            if(row.macroarea === 'Nord') {
                 n_pazienti += row.count_sum;
                 sum_eta += row.eta_sum;
                 sum_colesterolo += row.colesterolo_sum;
@@ -341,10 +222,8 @@ export default function DataSeeker() {
                 }
             }
         });
-        console.log(malattie);
         malattie.forEach((malattia) => {
             if(malattia.malattia === 'Diabete'){
-                console.log("aaaaaaaaaaaaaaaaaa");
                 sum_diabete = malattia.infetti;
             }
         })
@@ -379,7 +258,7 @@ export default function DataSeeker() {
         let sum_diabete = 0;
 
         decryptedData.forEach((row) => {
-            if(provinceCentro.includes(row.provincia)) {
+            if(row.macroarea === 'Centro') {
                 n_pazienti += row.count_sum;
                 sum_eta += row.eta_sum;
                 sum_colesterolo += row.colesterolo_sum;
@@ -444,7 +323,7 @@ export default function DataSeeker() {
         let sum_diabete = 0;
 
         decryptedData.forEach((row) => {
-            if(provinceSud.includes(row.provincia)) {
+            if(row.macroarea === 'Sud') {
                 n_pazienti += row.count_sum;
                 sum_eta += row.eta_sum;
                 sum_colesterolo += row.colesterolo_sum;
@@ -530,14 +409,14 @@ export default function DataSeeker() {
                 sum_respiratorie += row.difficolta_sum
                 sum_stanchezza += row.stanchezza_sum;
 
-                if(getLocation(row.provincia) === 'Nord'){
-                    n_nord = n_nord + 1;
+                if(row.macroarea === 'Nord'){
+                    n_nord = n_nord + row.count_sum;
                 }
-                if(getLocation(row.provincia) === 'Centro'){
-                    n_centro = n_centro + 1;
+                if(row.macroarea === 'Centro'){
+                    n_centro = n_centro + row.count_sum;
                 }
-                if(getLocation(row.provincia) === 'Sud'){
-                    n_sud = n_sud + 1;
+                if(row.macroarea === 'Sud'){
+                    n_sud = n_sud + row.count_sum;
                 }
             }
         });
@@ -565,11 +444,16 @@ export default function DataSeeker() {
     return(
         <div>
             <header className="header">
-                <button className="options" onClick={backHome}>Home</button>
-                <span style={{ marginLeft: '15px' }}>Logged in as: </span>
-                <button className="user options" style={{margin: '0px', marginRight: '15px'}}>{user} 🚧</button>
-                <button className="options">Assistenza clienti 🚧</button>
-                <button className="options" onClick={logout}>Logout</button>
+                <div className="options-container">
+                    <button className="options" onClick={backHome}>Home</button>
+                    <span> | </span>
+                    <span style={{ marginLeft: '15px' }}>Logged in as: </span>
+                    <button className="user options" style={{margin: '0px', marginRight: '15px'}}>{user} 🚧</button>
+                    <span> | </span>
+                    <button className="options">Assistenza clienti 🚧</button>
+                    <span> | </span>
+                    <button className="options" onClick={logout}>Logout</button>
+                </div>
             </header>
             <div className="container fade-in">
                 <h1>Dashboard Analisi</h1>
@@ -589,28 +473,31 @@ export default function DataSeeker() {
                     </div>
                     <div className="stat">
                         <h2>Età media</h2>
-                        <p>{generalStats.average_eta} </p>
+                        <p>{generalStats.average_eta.toFixed(0)} </p>
                     </div>
                     <div className="stat">
                         <h2>Glicemia media</h2>
-                        <p>{generalStats.average_glucosio / 100} mg/dl</p>
+                        <p>{(generalStats.average_glucosio / 100).toFixed(3)} mg/dl</p>
                     </div>
                     <div className="stat">
                         <h2>Colesterolo media</h2>
-                        <p>{generalStats.average_colesterolo / 100} mg/dl</p>
+                        <p>{(generalStats.average_colesterolo / 100).toFixed(3)} mg/dl</p>
                     </div>
                     <div className="stat">
                         <h2>Prevalenza Diabete</h2>
-                        <p>{generalStats.perc_diabete} %</p>
+                        <p>{generalStats.perc_diabete.toFixed(3)} %</p>
                     </div>
                     <div className="stat">
                         <h2>Percentuale Fumatori</h2>
-                        <p>{generalStats.perc_fumatore} %</p>
+                        <p>{generalStats.perc_fumatore.toFixed(3)} %</p>
                     </div>
                     <div className="stat">
-                        <h2>Genere</h2>
-                        <p>Uomini: {generalStats.perc_uomini} %
-                            Donne: {generalStats.perc_donne} % </p>
+                        <h2>Uomini</h2>
+                        <p>{generalStats.perc_uomini.toFixed(3)} % </p>
+                    </div>
+                    <div className="stat">
+                        <h2>Donne</h2>
+                        <p>{generalStats.perc_donne.toFixed(3)} % </p>
                     </div>
                 </div>
                 <h2>Report per luogo di provenienza</h2>
@@ -636,7 +523,7 @@ export default function DataSeeker() {
                     {generalStats.malattie.map((malattia) => (
                         <div className="stat" onClick={() => diseasePage(malattia.malattia)}>
                             <h2>{malattia.malattia}</h2>
-                            <p>{malattia.infetti / generalStats.pazienti_totali * 100} %</p>
+                            <p>{(malattia.infetti / generalStats.pazienti_totali * 100).toFixed(3)} %</p>
                             <h2>dei pazienti</h2>
                         </div>
                     ))}

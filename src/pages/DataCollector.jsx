@@ -54,14 +54,14 @@ async function encryptForm(formData, pkData) {
         encPayload[fieldName] = bigintHex(publicKey.encrypt(m));
     }
 
-    encPayload.provincia = formData.provincia;
+    encPayload.macroarea = formData.macroarea;
     encPayload.malattia = formData.malattia;
 
-    const oggi = new Date();
+    /*const oggi = new Date();
     const nomiMesi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
         "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
     encPayload.mese = nomiMesi[oggi.getMonth()];
-    encPayload.anno = oggi.getFullYear();
+    encPayload.anno = oggi.getFullYear();*/
 
     return encPayload;
 }
@@ -137,7 +137,7 @@ export default function DataCollector() {
         if (!formData.stanchezza) newErrors.stanchezza = 'Seleziona un\'opzione';
 
         // Validazione select
-        if (!formData.provincia) newErrors.provincia = 'Seleziona una provincia';
+        if (!formData.macroarea) newErrors.macroarea = 'Seleziona una macroarea';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -184,11 +184,16 @@ export default function DataCollector() {
     return(
         <div>
             <header className="header">
-                <button className="options" onClick={backHome}>Home</button>
-                <span style={{ marginLeft: '15px' }}>Logged in as: </span>
-                <button className="user options" style={{margin: '0px', marginRight: '15px'}}>{clinic} 🚧</button>
-                <button className="options">Assistenza clienti 🚧</button>
-                <button className="options" onClick={logout}>Logout</button>
+                <div className="options-container">
+                    <button className="options" onClick={backHome}>Home</button>
+                    <span> | </span>
+                    <span style={{ marginLeft: '15px' }}>Logged in as: </span>
+                    <button className="user options" style={{margin: '0px', marginRight: '15px'}}>{user} 🚧</button>
+                    <span> | </span>
+                    <button className="options">Assistenza clienti 🚧</button>
+                    <span> | </span>
+                    <button className="options" onClick={logout}>Logout</button>
+                </div>
             </header>
             <div className="container fade-in">
                 <h1>Dati del paziente</h1>
@@ -233,14 +238,14 @@ export default function DataCollector() {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="altezza">Altezza in metri</label>
+                            <label htmlFor="altezza">Altezza in cm</label>
                             <input
                                 type="text"
                                 id="altezza"
                                 name="altezza"
                                 value={formData.altezza}
                                 onChange={handleInputChange}
-                                placeholder="Es. 1.75"
+                                placeholder="Es. 175.0"
                                 className="form-input"
                             />
                         </div>
@@ -304,121 +309,18 @@ export default function DataCollector() {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="provincia">Provincia</label>
+                            <label htmlFor="provincia">Macroarea</label>
                             <select
-                                id="provincia"
-                                name="provincia"
-                                value={formData.provincia}
+                                id="macroarea"
+                                name="macroarea"
+                                value={formData.macroarea}
                                 onChange={handleInputChange}
                                 className="form-select"
                             >
-                                <option value="" disabled>Seleziona provincia</option>
-                                <option value="AG">Agrigento</option>
-                                <option value="AL">Alessandria</option>
-                                <option value="AN">Ancona</option>
-                                <option value="AO">Aosta</option>
-                                <option value="AR">Arezzo</option>
-                                <option value="AP">Ascoli Piceno</option>
-                                <option value="AT">Asti</option>
-                                <option value="AV">Avellino</option>
-                                <option value="BA">Bari</option>
-                                <option value="BT">Barletta-Andria-Trani</option>
-                                <option value="BL">Belluno</option>
-                                <option value="BN">Benevento</option>
-                                <option value="BG">Bergamo</option>
-                                <option value="BI">Biella</option>
-                                <option value="BO">Bologna</option>
-                                <option value="BZ">Bolzano</option>
-                                <option value="BS">Brescia</option>
-                                <option value="BR">Brindisi</option>
-                                <option value="CA">Cagliari</option>
-                                <option value="CL">Caltanissetta</option>
-                                <option value="CB">Campobasso</option>
-                                <option value="CE">Caserta</option>
-                                <option value="CZ">Catanzaro</option>
-                                <option value="CH">Chieti</option>
-                                <option value="CO">Como</option>
-                                <option value="CS">Cosenza</option>
-                                <option value="CR">Cremona</option>
-                                <option value="KR">Crotone</option>
-                                <option value="CN">Cuneo</option>
-                                <option value="EN">Enna</option>
-                                <option value="FM">Fermo</option>
-                                <option value="FE">Ferrara</option>
-                                <option value="FI">Firenze</option>
-                                <option value="FG">Foggia</option>
-                                <option value="FC">Forlì-Cesena</option>
-                                <option value="FR">Frosinone</option>
-                                <option value="GE">Genova</option>
-                                <option value="GO">Gorizia</option>
-                                <option value="GR">Grosseto</option>
-                                <option value="IM">Imperia</option>
-                                <option value="IS">Isernia</option>
-                                <option value="AQ">L'Aquila</option>
-                                <option value="SP">La Spezia</option>
-                                <option value="LT">Latina</option>
-                                <option value="LE">Lecce</option>
-                                <option value="LC">Lecco</option>
-                                <option value="LI">Livorno</option>
-                                <option value="LO">Lodi</option>
-                                <option value="LU">Lucca</option>
-                                <option value="MC">Macerata</option>
-                                <option value="MN">Mantova</option>
-                                <option value="MS">Massa-Carrara</option>
-                                <option value="MT">Matera</option>
-                                <option value="ME">Messina</option>
-                                <option value="MI">Milano</option>
-                                <option value="MO">Modena</option>
-                                <option value="MB">Monza e Brianza</option>
-                                <option value="NA">Napoli</option>
-                                <option value="NO">Novara</option>
-                                <option value="NU">Nuoro</option>
-                                <option value="OR">Oristano</option>
-                                <option value="PD">Padova</option>
-                                <option value="PA">Palermo</option>
-                                <option value="PR">Parma</option>
-                                <option value="PV">Pavia</option>
-                                <option value="PG">Perugia</option>
-                                <option value="PU">Pesaro e Urbino</option>
-                                <option value="PE">Pescara</option>
-                                <option value="PC">Piacenza</option>
-                                <option value="PI">Pisa</option>
-                                <option value="PT">Pistoia</option>
-                                <option value="PN">Pordenone</option>
-                                <option value="PZ">Potenza</option>
-                                <option value="PO">Prato</option>
-                                <option value="RG">Ragusa</option>
-                                <option value="RA">Ravenna</option>
-                                <option value="RC">Reggio Calabria</option>
-                                <option value="RE">Reggio Emilia</option>
-                                <option value="RI">Rieti</option>
-                                <option value="RN">Rimini</option>
-                                <option value="RM">Roma</option>
-                                <option value="RO">Rovigo</option>
-                                <option value="SA">Salerno</option>
-                                <option value="SS">Sassari</option>
-                                <option value="SV">Savona</option>
-                                <option value="SI">Siena</option>
-                                <option value="SR">Siracusa</option>
-                                <option value="SO">Sondrio</option>
-                                <option value="SU">Sud Sardegna</option>
-                                <option value="TA">Taranto</option>
-                                <option value="TE">Teramo</option>
-                                <option value="TR">Terni</option>
-                                <option value="TO">Torino</option>
-                                <option value="TP">Trapani</option>
-                                <option value="TN">Trento</option>
-                                <option value="TV">Treviso</option>
-                                <option value="TS">Trieste</option>
-                                <option value="UD">Udine</option>
-                                <option value="VA">Varese</option>
-                                <option value="VE">Venezia</option>
-                                <option value="VB">Verbano-Cusio-Ossola</option>
-                                <option value="VC">Vercelli</option>
-                                <option value="VR">Verona</option>
-                                <option value="VV">Vibo Valentia</option>
-                                <option value="VI">Vicenza</option>
-                                <option value="VT">Viterbo</option>
+                                <option value="" disabled>Seleziona... </option>
+                                <option value="Nord">Nord</option>
+                                <option value="Centro">Centro</option>
+                                <option value="Sud">Sud</option>
                             </select>
                         </div>
                     </div>

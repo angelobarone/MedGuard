@@ -41,9 +41,13 @@ export default function Login(){
     return (
         <div>
             <header className="header">
-                <button className="options" onClick={vaiAlJoinUs}>Join MedGuard 🚧</button>
-                <button className="options" >About Us 🚧</button>
-                <button className="options" >Contact Us 🚧</button>
+                <div>
+                    <button className="options" onClick={vaiAlJoinUs}>Join MedGuard 🚧</button>
+                    <span> | </span>
+                    <button className="options" >About Us 🚧</button>
+                    <span> | </span>
+                    <button className="options" >Contact Us 🚧</button>
+                </div>
             </header>
             <div className="container fade-in">
                 <img src = "/medguard.png" alt="logo" height="300px"/>

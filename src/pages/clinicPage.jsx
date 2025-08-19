@@ -34,10 +34,14 @@ export default function ClinicPage() {
     return (
         <div>
             <header className="header">
-                <span style={{ marginLeft: '15px' }}>Logged in as: </span>
-                <button className="user options" style={{margin: '0px', marginRight: '15px'}}>{clinic} 🚧</button>
-                <button className="options">Assistenza clienti 🚧</button>
-                <button className="options" onClick={logout}>Logout</button>
+                <div className="options-container">
+                    <span style={{ marginLeft: '15px' }}>Logged in as: </span>
+                    <button className="user options" style={{margin: '0px', marginRight: '15px'}}>{user} 🚧</button>
+                    <span> | </span>
+                    <button className="options">Assistenza clienti 🚧</button>
+                    <span> | </span>
+                    <button className="options" onClick={logout}>Logout</button>
+                </div>
             </header>
             <div className = "container fade-in">
                 <img src="/medguard.png" alt="logo" height="300px" />
