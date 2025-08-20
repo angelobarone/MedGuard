@@ -13,10 +13,10 @@ Questo è il **frontend** del progetto universitario **MedGuard**, sviluppato pe
 
 ## ⚙️ Funzionalità principali
 - Form per l’inserimento di dati sanitari di esempio
-- Cifratura dei dati con la chiave pubblica ottenuta dal server delle chiavi
-- Invio dei dati cifrati al backend
+- Cifratura dei dati con la chiave pubblica ottenuta dal server 
+- Invio dei dati cifrati al server
 - Recupero dei dati cifrati dal server
-- Decrittazione dei dati
+- Decrittazione dei dati per gli utenti autorizzati mediante chiave privata fornita dal server
 - Visualizzazione dei risultati aggregati
 
 ## ▶️ Avvio locale
