@@ -2,6 +2,39 @@ import '../stylesheet/App.css'
 import {useNavigate} from "react-router-dom";
 import React from 'react';
 
+async function deriveKeyFromToken(token) {
+    const enc = new TextEncoder().encode(token);
+    const hash = await crypto.subtle.digest("SHA-256", enc);
+    return crypto.subtle.importKey(
+        "raw",
+        hash,
+        { name: "AES-GCM" },
+        false,
+        ["encrypt", "decrypt"]
+    );
+}
+
+async function decryptWithToken(encData, token) {
+    const key = await deriveKeyFromToken(token);
+
+    const nonce = Uint8Array.from(atob(encData.nonce), c => c.charCodeAt(0));
+    const ciphertext = Uint8Array.from(atob(encData.ciphertext), c => c.charCodeAt(0));
+    const tag = Uint8Array.from(atob(encData.tag), c => c.charCodeAt(0));
+
+    const combined = new Uint8Array(ciphertext.length + tag.length);
+    combined.set(ciphertext);
+    combined.set(tag, ciphertext.length);
+
+    const plaintext = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: nonce },
+        key,
+        combined
+    );
+
+    return JSON.parse(new TextDecoder().decode(plaintext));
+}
+
+
 
 export default function AuthorizedPage() {
     const user = sessionStorage.getItem('username')
@@ -22,13 +55,12 @@ export default function AuthorizedPage() {
     }
 
     PrivateKeyFetcher()
-        .then(result => {
-            const pkData = {
-                n: result.n.toString(),
-                g: result.g.toString(),
-                p: result.p.toString(),
-                q: result.q.toString()
-            };
+        .then(async result => {
+            const token = sessionStorage.getItem('token');
+            console.log('Token recuperato:', token);
+            console.log('Risposta dal server:', result);
+            const pkData = await decryptWithToken(result, token);
+            console.log('Private key decrypted:', pkData);
             sessionStorage.setItem('privateKey', JSON.stringify(pkData));
             })
         .catch(error => console.error("Errore finale:", error));
@@ -56,6 +88,7 @@ export default function AuthorizedPage() {
 async function PrivateKeyFetcher() {
     try {
         const username = sessionStorage.getItem('username');
+        const token = sessionStorage.getItem('token');
         if (!username) {
             throw new Error('Username non trovato nella session storage');
         }
@@ -71,7 +104,7 @@ async function PrivateKeyFetcher() {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ username: username }),
+            body: JSON.stringify({ username: username, token: token}),
             signal: controller.signal
         });
         clearTimeout(timeoutId);
