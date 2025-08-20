@@ -18,7 +18,7 @@ Questo è il **frontend** del progetto universitario **MedGuard**, sviluppato pe
 - Visualizzazione dei risultati aggregati (decrittati dai ricercatori)
 
 ## ▶️ Avvio locale
-  npm install
+  npm install -
   npm run dev 
 
 ## 📚 Note
