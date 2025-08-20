@@ -15,7 +15,9 @@ Questo è il **frontend** del progetto universitario **MedGuard**, sviluppato pe
 - Form per l’inserimento di dati sanitari di esempio
 - Cifratura dei dati con la chiave pubblica ottenuta dal server delle chiavi
 - Invio dei dati cifrati al backend
-- Visualizzazione dei risultati aggregati (decrittati dai ricercatori)
+- Recupero dei dati cifrati dal server
+- Decrittazione dei dati
+- Visualizzazione dei risultati aggregati
 
 ## ▶️ Avvio locale
   npm install -
