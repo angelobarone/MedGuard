@@ -5,7 +5,6 @@ import {useEffect, useState} from "react";
 import { useMemo } from "react";
 import React from 'react';
 
-
 export default function DataSeeker() {
     const user = sessionStorage.getItem('username');
     const navigate = useNavigate();
@@ -24,6 +23,11 @@ export default function DataSeeker() {
         navigate('/authorizedPage');
     }
 
+    const updatePage = () => {
+        sessionStorage.removeItem('decryptedData');
+        navigate(0);
+    }
+
     const northPage = () => {
         navigate('/localePage', {state: {data: nordData, locale: "Nord"}});
     }
@@ -36,6 +40,55 @@ export default function DataSeeker() {
     const diseasePage = (disease) => {
         navigate('/diseasePage', {state: {data: diseaseData(disease), disease: disease}})
     }
+    const publishData = async () => {
+        const payload = {}
+        payload.n_pazienti = generalStats.pazienti_totali;
+        payload.eta_media = generalStats.average_eta;
+        payload.colesterolo_media = generalStats.average_colesterolo;
+        payload.glicemia_media = generalStats.average_glucosio;
+        payload.percentuale_fumatori = generalStats.perc_fumatore;
+        payload.percentuale_uomini = generalStats.perc_uomini;
+        payload.percentuale_donne = generalStats.perc_donne;
+        payload.prevalenza_diabete = generalStats.perc_diabete;
+        payload.n_nord = nordData.pazienti_totali;
+        payload.eta_media_nord = nordData.average_eta;
+        payload.colesterolo_media_nord = nordData.average_colesterolo;
+        payload.glicemia_media_nord = nordData.average_glucosio;
+        payload.percentuale_fumatori_nord = nordData.perc_fumatore;
+        payload.percentuale_uomini_nord = nordData.perc_uomini;
+        payload.percentuale_donne_nord = nordData.perc_donne;
+        payload.prevalenza_diabete_nord = nordData.perc_diabete;
+        payload.n_sud = sudData.pazienti_totali;
+        payload.eta_media_sud = sudData.average_eta;
+        payload.colesterolo_media_sud = sudData.average_colesterolo;
+        payload.glicemia_media_sud = sudData.average_glucosio;
+        payload.percentuale_fumatori_sud = sudData.perc_fumatore;
+        payload.percentuale_uomini_sud = sudData.perc_uomini;
+        payload.percentuale_donne_sud = sudData.perc_donne;
+        payload.prevalenza_diabete_sud = sudData.perc_diabete;
+        payload.n_centro = centroData.pazienti_totali;
+        payload.eta_media_centro = centroData.average_eta;
+        payload.colesterolo_media_centro = centroData.average_colesterolo;
+        payload.glicemia_media_centro = centroData.average_glucosio;
+        payload.percentuale_fumatori_centro = centroData.perc_fumatore;
+        payload.percentuale_uomini_centro = centroData.perc_uomini;
+        payload.percentuale_donne_centro = centroData.perc_donne;
+        payload.prevalenza_diabete_centro = centroData.perc_diabete;
+
+        console.log(payload);
+        const response = await fetch('http://127.0.0.1:5000/PublishData', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({payload: payload})
+        });
+        const result = await response.json();
+        if(result.success) {
+            alert('Dati pubblicati con successo');
+        } else {
+            alert('Errore durante la pubblicazione dei dati');
+        }
+    }
+
 
     useEffect(() => {
         const savedData = sessionStorage.getItem('decryptedData');
@@ -456,7 +509,11 @@ export default function DataSeeker() {
                 </div>
             </header>
             <div className="container fade-in">
-                <h1>Dashboard Analisi</h1>
+                <div className="title-container">
+                    <h1>Dashboard Analisi</h1>
+                    <button className="button" onClick={updatePage}>Update</button>
+                </div>
+
                 <div>
                     {(isDownloading || isDecrypting) && (
                         <div className="loading-overlay">
@@ -528,6 +585,7 @@ export default function DataSeeker() {
                         </div>
                     ))}
                 </div>
+                <button className="button" onClick={publishData}>Publish Data</button>
             </div>
         </div>
     );

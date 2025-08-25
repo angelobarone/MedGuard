@@ -14,6 +14,7 @@ import ClinicPage from "./pages/clinicPage.jsx";
 import DataCollector from "./pages/DataCollector.jsx";
 import LocalePage from "./pages/localePage.jsx";
 import DiseasePage from "./pages/diseasePage.jsx";
+import PublishedData from "./pages/publishedData.jsx";
 import React from 'react';
 
 const images = [img1,img2, img4, img5]
@@ -72,6 +73,7 @@ export default function App() {
                 <Route path="/dataCollector" element={<DataCollector />} />
                 <Route path="/localePage" element={<LocalePage />} />
                 <Route path="/diseasePage" element={<DiseasePage />} />
+                <Route path="/publishedData" element={<PublishedData />} />
             </Routes>
         </div>
     );

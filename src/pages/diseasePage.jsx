@@ -21,6 +21,10 @@ export default function DiseasePage() {
         navigate('/authorizedPage');
     }
 
+    const back = () => {
+        navigate(-1);
+    }
+
     return(
         <div>
             <header className="header">
@@ -36,7 +40,10 @@ export default function DiseasePage() {
                 </div>
             </header>
             <div className="container fade-in">
-                <h1>Dashboard Analisi</h1>
+                <div className="title-container">
+                    <h1>Dashboard Analisi</h1>
+                    <button className="button" onClick={back}> &lt; back</button>
+                </div>
                 <h2>Panoramica Pazienti {disease}</h2>
                 <div className="row1">
                     <div className="stat">

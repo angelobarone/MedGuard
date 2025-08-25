@@ -16,6 +16,10 @@ export default function ClinicPage() {
         navigate('/dataCollector');  // sposta verso un’altra pagina definita in App.jsx
     };
 
+    const publishedData = () => {
+        navigate('/publishedData');
+    };
+
     const logout = () => {
         sessionStorage.clear();
         navigate('/login');
@@ -36,7 +40,7 @@ export default function ClinicPage() {
             <header className="header">
                 <div className="options-container">
                     <span style={{ marginLeft: '15px' }}>Logged in as: </span>
-                    <button className="user options" style={{margin: '0px', marginRight: '15px'}}>{user} 🚧</button>
+                    <button className="user options" style={{margin: '0px', marginRight: '15px'}}>{clinic} 🚧</button>
                     <span> | </span>
                     <button className="options">Assistenza clienti 🚧</button>
                     <span> | </span>
@@ -46,6 +50,7 @@ export default function ClinicPage() {
             <div className = "container fade-in">
                 <img src="/medguard.png" alt="logo" height="300px" />
                 <button className="button" onClick={inserisciDati}>Inserisci nuovi dati</button>
+                <button className="button" onClick={publishedData}>Dati pubblicati</button>
             </div>
         </div>
     );

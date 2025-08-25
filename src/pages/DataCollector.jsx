@@ -57,12 +57,6 @@ async function encryptForm(formData, pkData) {
     encPayload.macroarea = formData.macroarea;
     encPayload.malattia = formData.malattia;
 
-    /*const oggi = new Date();
-    const nomiMesi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
-        "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
-    encPayload.mese = nomiMesi[oggi.getMonth()];
-    encPayload.anno = oggi.getFullYear();*/
-
     return encPayload;
 }
 
@@ -188,7 +182,7 @@ export default function DataCollector() {
                     <button className="options" onClick={backHome}>Home</button>
                     <span> | </span>
                     <span style={{ marginLeft: '15px' }}>Logged in as: </span>
-                    <button className="user options" style={{margin: '0px', marginRight: '15px'}}>{user} 🚧</button>
+                    <button className="user options" style={{margin: '0px', marginRight: '15px'}}>{clinic} 🚧</button>
                     <span> | </span>
                     <button className="options">Assistenza clienti 🚧</button>
                     <span> | </span>
