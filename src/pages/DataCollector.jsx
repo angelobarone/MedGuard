@@ -1,5 +1,5 @@
 import '../stylesheet/App.css'
-import {Form, useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
 import * as paillier from "paillier-bigint"
 import React from 'react';
@@ -27,7 +27,6 @@ async function encryptForm(formData, pkData) {
     const publicKey = new paillier.PublicKey(BigInt(pkData.n), BigInt(pkData.g));
 
     encPayload.count_sum = bigintHex(publicKey.encrypt(1n));
-
     const boolFields = {
         febbre_sum: formData.febbre ? 1n : 0n,
         tosse_sum: formData.tosse ? 1n : 0n,
@@ -38,9 +37,7 @@ async function encryptForm(formData, pkData) {
     for (const [field, value] of Object.entries(boolFields)) {
         encPayload[field] = bigintHex(publicKey.encrypt(value));
     }
-
     encPayload.genere_sum = bigintHex(publicKey.encrypt(BigInt(genderToInt(formData.genere))));
-
     encPayload.eta_sum = bigintHex(publicKey.encrypt(BigInt(formData.eta || 0)));
 
     for (const [fieldName, key] of [
@@ -113,29 +110,43 @@ export default function DataCollector() {
     const validateForm = () => {
         const newErrors = {};
 
-        // Validazione testo/numeri
-        if (!formData.malattia.trim()) newErrors.malattia = 'Campo obbligatorio';
-        if (!formData.eta) newErrors.eta = 'Campo obbligatorio';
-        if (!formData.peso) newErrors.peso = 'Campo obbligatorio';
-        if (!formData.altezza) newErrors.altezza = 'Campo obbligatorio';
-        if (!formData.pressioneSangue.trim()) newErrors.pressioneSangue = 'Campo obbligatorio';
-        if (!formData.colesterolo) newErrors.colesterolo = 'Campo obbligatorio';
-        if (!formData.glucosio) newErrors.glucosio = 'Campo obbligatorio';
+        if (!formData.malattia.trim()) newErrors.malattia = 'Malattia è obbligatoria';
 
-        // Validazione radio button
-        if (!formData.genere) newErrors.genere = 'Seleziona un\'opzione';
-        if (!formData.fumatore) newErrors.fumatore = 'Seleziona un\'opzione';
-        if (!formData.febbre) newErrors.febbre = 'Seleziona un\'opzione';
-        if (!formData.tosse) newErrors.tosse = 'Seleziona un\'opzione';
-        if (!formData.difficoltaRespiratorie) newErrors.difficoltaRespiratorie = 'Seleziona un\'opzione';
-        if (!formData.stanchezza) newErrors.stanchezza = 'Seleziona un\'opzione';
+        if (!formData.eta) newErrors.eta = 'Età è obbligatoria';
+        else if (isNaN(formData.eta) || formData.eta <= 0) newErrors.eta = 'Età deve essere un numero positivo';
 
-        // Validazione select
+        if (!formData.peso) newErrors.peso = 'Peso è obbligatorio';
+        else if (isNaN(formData.peso) || formData.peso <= 0) newErrors.peso = 'Peso deve essere un numero positivo';
+
+        if (!formData.altezza) newErrors.altezza = 'Altezza è obbligatoria';
+        else if (isNaN(formData.altezza) || formData.altezza <= 0) newErrors.altezza = 'Altezza deve essere un numero positivo';
+
+        if (!formData.colesterolo) newErrors.colesterolo = 'Colesterolo è obbligatorio';
+        else if (isNaN(formData.colesterolo) || formData.colesterolo <= 0) newErrors.colesterolo = 'Colesterolo deve essere positivo';
+
+        if (!formData.glucosio) newErrors.glucosio = 'Glucosio è obbligatorio';
+        else if (isNaN(formData.glucosio) || formData.glucosio <= 0) newErrors.glucosio = 'Glucosio deve essere positivo';
+
+        if (!formData.pressioneSangue.trim()) {
+            newErrors.pressioneSangue = 'Pressione è obbligatoria';
+        } else if (!/^\d{2,3}$/.test(formData.pressioneSangue)) {
+            newErrors.pressioneSangue = 'La pressione massima deve essere un numero di 2 o 3 cifre (es. 120)';
+        }
+        ['genere', 'fumatore', 'febbre', 'tosse', 'difficoltaRespiratorie', 'stanchezza'].forEach(field => {
+            if (!formData[field]) newErrors[field] = 'Seleziona un\'opzione';
+        });
+
         if (!formData.macroarea) newErrors.macroarea = 'Seleziona una macroarea';
 
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        if (Object.keys(newErrors).length > 0) {
+            console.log('Errori di validazione:', newErrors);
+            return false;
+        }
+
+        return true;
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -248,14 +259,15 @@ export default function DataCollector() {
                     <div className="grid grid-cols-3 gap-4">
                         <div className="form-group">
                             <label>Genere</label>
-                            <div className="radio-group">
+                            <div className="radio-group" >
                                 <div className="radio-option">
                                     <input
                                         type="radio"
                                         id="m"
                                         name="genere"
                                         value="M"
-                                        checked={formData.genere === 'M'}
+                                        data-testid="genere-M"
+                                        checked={formData.genere === "M"}
                                         onChange={handleInputChange}
                                     />
                                     <label htmlFor="m">M</label>
@@ -266,7 +278,8 @@ export default function DataCollector() {
                                         id="f"
                                         name="genere"
                                         value="F"
-                                        checked={formData.genere === 'F'}
+                                        data-testid="genere-F"
+                                        checked={formData.genere === "F"}
                                         onChange={handleInputChange}
                                     />
                                     <label htmlFor="f">F</label>
@@ -283,7 +296,8 @@ export default function DataCollector() {
                                         id="fumatore-si"
                                         name="fumatore"
                                         value="Si"
-                                        checked={formData.fumatore === 'Si'}
+                                        data-testid="fumatore-Si"
+                                        checked={formData.fumatore === "Si"}
                                         onChange={handleInputChange}
                                     />
                                     <label htmlFor="fumatore-si">Sì</label>
@@ -294,7 +308,8 @@ export default function DataCollector() {
                                         id="fumatore-no"
                                         name="fumatore"
                                         value="No"
-                                        checked={formData.fumatore === 'No'}
+                                        data-testid="fumatore-No"
+                                        checked={formData.fumatore === "No"}
                                         onChange={handleInputChange}
                                     />
                                     <label htmlFor="fumatore-no">No</label>
@@ -303,15 +318,17 @@ export default function DataCollector() {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="provincia">Macroarea</label>
+                            <label htmlFor="macroarea">Macroarea</label>
                             <select
+                                className="form-select"
                                 id="macroarea"
                                 name="macroarea"
                                 value={formData.macroarea}
                                 onChange={handleInputChange}
-                                className="form-select"
                             >
-                                <option value="" disabled>Seleziona... </option>
+                                <option disabled value="">
+                                    Seleziona...
+                                </option>
                                 <option value="Nord">Nord</option>
                                 <option value="Centro">Centro</option>
                                 <option value="Sud">Sud</option>
@@ -331,7 +348,8 @@ export default function DataCollector() {
                                             id="febbre-si"
                                             name="febbre"
                                             value="Si"
-                                            checked={formData.febbre === 'Si'}
+                                            data-testid="febbre-Si"
+                                            checked={formData.febbre === "Si"}
                                             onChange={handleInputChange}
                                         />
                                         <label htmlFor="febbre-si">Sì</label>
@@ -342,7 +360,8 @@ export default function DataCollector() {
                                             id="febbre-no"
                                             name="febbre"
                                             value="No"
-                                            checked={formData.febbre === 'No'}
+                                            data-testid="febbre-No"
+                                            checked={formData.febbre === "No"}
                                             onChange={handleInputChange}
                                         />
                                         <label htmlFor="febbre-no">No</label>
@@ -359,7 +378,8 @@ export default function DataCollector() {
                                             id="tosse-si"
                                             name="tosse"
                                             value="Si"
-                                            checked={formData.tosse === 'Si'}
+                                            data-testid="tosse-Si"
+                                            checked={formData.tosse === "Si"}
                                             onChange={handleInputChange}
                                         />
                                         <label htmlFor="tosse-si">Sì</label>
@@ -370,7 +390,8 @@ export default function DataCollector() {
                                             id="tosse-no"
                                             name="tosse"
                                             value="No"
-                                            checked={formData.tosse === 'No'}
+                                            data-testid="tosse-No"
+                                            checked={formData.tosse === "No"}
                                             onChange={handleInputChange}
                                         />
                                         <label htmlFor="tosse-no">No</label>
@@ -387,7 +408,8 @@ export default function DataCollector() {
                                             id="difficoltaRespiratorie-si"
                                             name="difficoltaRespiratorie"
                                             value="Si"
-                                            checked={formData.difficoltaRespiratorie === 'Si'}
+                                            data-testid="difficoltaRespiratorie-Si"
+                                            checked={formData.difficoltaRespiratorie === "Si"}
                                             onChange={handleInputChange}
                                         />
                                         <label htmlFor="difficoltaRespiratorie-si">Sì</label>
@@ -398,7 +420,8 @@ export default function DataCollector() {
                                             id="difficoltaRespiratorie-no"
                                             name="difficoltaRespiratorie"
                                             value="No"
-                                            checked={formData.difficoltaRespiratorie === 'No'}
+                                            data-testid="difficoltaRespiratorie-No"
+                                            checked={formData.difficoltaRespiratorie === "No"}
                                             onChange={handleInputChange}
                                         />
                                         <label htmlFor="difficoltaRespiratorie-no">No</label>
@@ -415,7 +438,8 @@ export default function DataCollector() {
                                             id="stanchezza-si"
                                             name="stanchezza"
                                             value="Si"
-                                            checked={formData.stanchezza === 'Si'}
+                                            data-testid="stanchezza-Si"
+                                            checked={formData.stanchezza === "Si"}
                                             onChange={handleInputChange}
                                         />
                                         <label htmlFor="stanchezza-si">Sì</label>
@@ -426,7 +450,8 @@ export default function DataCollector() {
                                             id="stanchezza-no"
                                             name="stanchezza"
                                             value="No"
-                                            checked={formData.stanchezza === 'No'}
+                                            data-testid="stanchezza-No"
+                                            checked={formData.stanchezza === "No"}
                                             onChange={handleInputChange}
                                         />
                                         <label htmlFor="stanchezza-no">No</label>

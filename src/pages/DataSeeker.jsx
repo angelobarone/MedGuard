@@ -1,14 +1,13 @@
 import '../stylesheet/App2.css'
 import {useNavigate} from "react-router-dom";
 import * as paillier from "paillier-bigint";
-import {useEffect, useState} from "react";
-import { useMemo } from "react";
-import React from 'react';
+import React, {useEffect, useMemo, useState} from "react";
 
 export default function DataSeeker() {
     const user = sessionStorage.getItem('username');
     const navigate = useNavigate();
     const pkData = JSON.parse(sessionStorage.getItem('privateKey'));
+    const privateKey = reconstructionPrivateKey(pkData);
     const [isDownloading, setIsDownloading] = useState(false);
     const [decryptedData, setDecryptedData] = useState([]);
     const [isDecrypting, setIsDecrypting] = useState(false);
@@ -97,6 +96,7 @@ export default function DataSeeker() {
         } else {
             const fetchData = async () => {
                 try {
+                    const startDownloading_time = performance.now();
                     setIsDownloading(true);
                     const response = await fetch('http://127.0.0.1:5000/encDataSender', {
                         method: 'POST',
@@ -104,36 +104,48 @@ export default function DataSeeker() {
                         body: JSON.stringify({ user: user })
                     });
                     const result = await response.json();
-
+                    const endDownloading_time = performance.now();
+                    console.log(`Download completato in ${(endDownloading_time - startDownloading_time)/1000} s`);
+                    setIsDownloading(false);
+                    let n = 0;
                     if(result.success) {
+                        const startDecrypting_time = performance.now();
+                        let averageOneDecryptionTime = 0;
                         setIsDecrypting(true);
                         setTimeout(async () => {
                             try {
                                 const decrypted = await Promise.all(
-                                    result.data.map(async (row) => ({
-                                        macroarea: row.macroarea,
-                                        malattia: row.malattia,
-                                        count_sum: await decryptPaillierValue(row.count_sum),
-                                        eta_sum: await decryptPaillierValue(row.eta_sum),
-                                        colesterolo_sum: await decryptPaillierValue(row.colesterolo_sum),
-                                        pressione_sum: await decryptPaillierValue(row.pressione_sum),
-                                        glucosio_sum: await decryptPaillierValue(row.glucosio_sum),
-                                        fumatore_sum: await decryptPaillierValue(row.fumatore_sum),
-                                        febbre_sum: await decryptPaillierValue(row.febbre_sum),
-                                        tosse_sum: await decryptPaillierValue(row.tosse_sum),
-                                        difficolta_sum: await decryptPaillierValue(row.difficolta_sum),
-                                        stanchezza_sum: await decryptPaillierValue(row.stanchezza_sum),
-                                        genere_sum: await decryptPaillierValue(row.genere_sum),
-                                        peso_sum: await decryptPaillierValue(row.peso_sum),
-                                        altezza_sum: await decryptPaillierValue(row.altezza_sum)
-                                    }))
+                                    result.data.map(async (row, index) => {
+                                        const decryptedRow = {
+                                            macroarea: row.macroarea,
+                                            malattia: row.malattia,
+                                            count_sum: await decryptPaillierValue(row.count_sum, privateKey),
+                                            eta_sum: await decryptPaillierValue(row.eta_sum, privateKey),
+                                            colesterolo_sum: await decryptPaillierValue(row.colesterolo_sum, privateKey),
+                                            pressione_sum: await decryptPaillierValue(row.pressione_sum, privateKey),
+                                            glucosio_sum: await decryptPaillierValue(row.glucosio_sum, privateKey),
+                                            fumatore_sum: await decryptPaillierValue(row.fumatore_sum, privateKey),
+                                            febbre_sum: await decryptPaillierValue(row.febbre_sum, privateKey),
+                                            tosse_sum: await decryptPaillierValue(row.tosse_sum, privateKey),
+                                            difficolta_sum: await decryptPaillierValue(row.difficolta_sum, privateKey),
+                                            stanchezza_sum: await decryptPaillierValue(row.stanchezza_sum, privateKey),
+                                            genere_sum: await decryptPaillierValue(row.genere_sum, privateKey),
+                                            peso_sum: await decryptPaillierValue(row.peso_sum, privateKey),
+                                            altezza_sum: await decryptPaillierValue(row.altezza_sum, privateKey)
+                                        };
+                                        return decryptedRow;
+                                    })
                                 );
                                 setDecryptedData(decrypted);
+                                n = decrypted.length;
                                 sessionStorage.setItem('decryptedData', JSON.stringify(decrypted));
                             } catch (error) {
                                 console.error('Errore nella decrittazione:', error);
                             } finally {
                                 setIsDecrypting(false);
+                                const endDecrypting_time = performance.now();
+                                console.log(`Decrittazione completata in ${(endDecrypting_time - startDecrypting_time)/1000} s`);
+                                console.log(`Tempo medio di decrittazione di una riga: ${((endDecrypting_time - startDecrypting_time)/n)/1000} s`);
                             }
                         }, 100);
                     }
@@ -148,14 +160,14 @@ export default function DataSeeker() {
     }, [user]);
 
     // Funzione di decrittazione
-    const decryptPaillierValue = async (encryptedHex) => {
+    const decryptPaillierValue = async (encryptedHex, privateKey) => {
         try{
             // Converte da esadecimale a BigInt
             const hexString = encryptedHex.startsWith('0x')
                 ? encryptedHex
                 : `0x${encryptedHex}`;
             const encryptedBigInt = BigInt(hexString);
-            const privateKey = reconstructionPrivateKey(pkData);
+
             if(privateKey === null) throw new Error(
                 "Errore nella ricostruzione della chiave privata"
             )
