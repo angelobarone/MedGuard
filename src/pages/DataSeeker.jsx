@@ -3,6 +3,9 @@ import {useNavigate} from "react-router-dom";
 import * as paillier from "paillier-bigint";
 import React, {useEffect, useMemo, useState} from "react";
 
+const BACKEND_API = import.meta.env.VITE_API_URL_BACKEND;
+const TRUSTEDAUTHORITY_API = import.meta.env.VITE_API_URL_TRUSTEDAUTHORITY;
+
 export default function DataSeeker() {
     const user = sessionStorage.getItem('username');
     const navigate = useNavigate();
@@ -75,7 +78,7 @@ export default function DataSeeker() {
         payload.prevalenza_diabete_centro = centroData.perc_diabete;
 
         console.log(payload);
-        const response = await fetch('http://127.0.0.1:5000/PublishData', {
+        const response = await fetch(`${BACKEND_API}/PublishData`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({payload: payload})
@@ -98,7 +101,7 @@ export default function DataSeeker() {
                 try {
                     const startDownloading_time = performance.now();
                     setIsDownloading(true);
-                    const response = await fetch('http://127.0.0.1:5000/encDataSender', {
+                    const response = await fetch(`${BACKEND_API}/encDataSender`, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ user: user })

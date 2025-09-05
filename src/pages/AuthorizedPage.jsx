@@ -2,6 +2,9 @@ import '../stylesheet/App.css'
 import {useNavigate} from "react-router-dom";
 import React from 'react';
 
+const BACKEND_API = import.meta.env.VITE_API_URL_BACKEND;
+const TRUSTEDAUTHORITY_API = import.meta.env.VITE_API_URL_TRUSTEDAUTHORITY;
+
 async function deriveKeyFromToken(token) {
     const enc = new TextEncoder().encode(token);
     const hash = await crypto.subtle.digest("SHA-256", enc);
@@ -98,7 +101,7 @@ async function PrivateKeyFetcher() {
         const timeout = 8000;
         const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-        const response = await fetch('http://127.0.0.1:5001/getPrivateKey', {
+        const response = await fetch(`${TRUSTEDAUTHORITY_API}/getPrivateKey`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

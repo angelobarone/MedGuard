@@ -4,6 +4,9 @@ import {BackgroundCarousel} from "../App.jsx";
 import '../stylesheet/App.css'
 import React from 'react';
 
+const BACKEND_API = import.meta.env.VITE_API_URL_BACKEND;
+const TRUSTEDAUTHORITY_API = import.meta.env.VITE_API_URL_TRUSTEDAUTHORITY;
+
 export default function Login(){
     const navigate = useNavigate();
     const [usernameInput, setUsernameInput] = useState("");
@@ -13,7 +16,7 @@ export default function Login(){
 
     const handleLogin = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:5000/login', {
+            const response = await fetch(`${BACKEND_API}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: usernameInput, password: passwordInput }),

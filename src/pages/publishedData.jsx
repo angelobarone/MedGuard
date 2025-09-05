@@ -3,6 +3,9 @@ import {useNavigate} from "react-router-dom";
 import { useEffect, useState } from "react";
 import React from 'react';
 
+const BACKEND_API = import.meta.env.VITE_API_URL_BACKEND;
+const TRUSTEDAUTHORITY_API = import.meta.env.VITE_API_URL_TRUSTEDAUTHORITY;
+
 export default function PublishedData() {
     const clinic = sessionStorage.getItem('username');
     const navigate = useNavigate();
@@ -25,7 +28,7 @@ export default function PublishedData() {
     useEffect(() => {
         const getData = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:5000/getPublishedData");
+                const response = await fetch(`${BACKEND_API}/getPublishedData`);
                 const result = await response.json();
 
                 if (result.success && result.data.length > 0) {

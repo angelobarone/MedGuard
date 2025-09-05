@@ -4,6 +4,9 @@ import { useState } from 'react';
 import * as paillier from "paillier-bigint"
 import React from 'react';
 
+const BACKEND_API = import.meta.env.VITE_API_URL_BACKEND;
+const TRUSTEDAUTHORITY_API = import.meta.env.VITE_API_URL_TRUSTEDAUTHORITY;
+
 //mapping per la codifica dei dati
 const genderToInt = g => (g === 'F' ? 1n : 0n); // M=0, F=1
 const scale = 100n; // per fixed-point
@@ -159,8 +162,12 @@ export default function DataCollector() {
             if(!pkData) {
                 throw new Error('Public key non trovato');
             }
+            const encTime_start = performance.now();
             const encData = await encryptForm(formData, pkData);
-            const response = await fetch('http://127.0.0.1:5000/encDataReceiver', {
+            const encTime_end = performance.now();
+            const encTime = ((encTime_end - encTime_start)/1000).toFixed(4);
+            console.log('Tempo di crittografia:', encTime, 's');
+            const response = await fetch(`${BACKEND_API}/encDataReceiver`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
